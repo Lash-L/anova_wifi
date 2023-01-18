@@ -66,12 +66,12 @@ dataset_one = [
 
 
 def test_can_create():
-    AnovaPrecisionCooker("")
+    AnovaPrecisionCooker()
 
 
 @mock.patch("anova_wifi.parser.requests.get")
 def test_data_1(requests_mocked):
-    apc = AnovaPrecisionCooker("")
+    apc = AnovaPrecisionCooker()
     requests_mocked.return_value = MockResponse(json_data=dataset_one, status_code=200)
     result = apc.update("")
     print(result)

@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 import requests
 from sensor_state_data import SensorData, SensorDeviceClass, Units
@@ -32,14 +31,13 @@ TEMP_MAP = {"F": Units.TEMP_FAHRENHEIT, "C": Units.TEMP_CELSIUS}
 
 
 class AnovaPrecisionCooker(SensorData):
-    def __init__(self, device_key: str):
+    def __init__(self) -> None:
         super().__init__()
-        self.device_key = device_key
 
-    def _start_update(self, data: Any) -> None:
+    def _start_update(self, device_key: str) -> None:
         anova_status = (
             requests.get(
-                f"https://anovaculinary.io/devices/{self.device_key}/states/?limit=1"
+                f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
             )
             .json()[0]
             .get("body")
