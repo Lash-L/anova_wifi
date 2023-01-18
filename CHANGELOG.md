@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.2 (2023-01-18)
+### Fix
+* Changing requests version for HA ([`ac36315`](https://github.com/conway220/anova_wifi/commit/ac36315fc4239b9816ca244d66c267434f703bd5))
+
 ## v0.1.1 (2023-01-18)
 ### Fix
 * Moved device_key to start_update ([`1dddd7f`](https://github.com/conway220/anova_wifi/commit/1dddd7fc80b8d915df71f4c9bd4bd322647ff811))
