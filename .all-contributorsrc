@@ -1,0 +1,27 @@
+{
+  "projectName": "anova-wifi",
+  "projectOwner": "conway220",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 80,
+  "commit": true,
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "conway220",
+      "name": "Luke",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20257911?v=4",
+      "profile": "https://github.com/conway220",
+      "contributions": [
+        "code",
+        "ideas",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true
+}
