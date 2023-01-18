@@ -68,3 +68,5 @@ This package was created with
 [Copier](https://copier.readthedocs.io/) and the
 [browniebroke/pypackage-template](https://github.com/browniebroke/pypackage-template)
 project template.
+
+This is heavily based off of information from [this reddit post](https://www.reddit.com/r/sousvide/comments/p43k18/tracking_my_anovas_status_over_time_using_the_api/) by [/u/InitializedVariable](https://www.reddit.com/user/InitializedVariable)
