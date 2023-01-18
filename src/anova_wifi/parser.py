@@ -86,7 +86,7 @@ class AnovaPrecisionCooker(SensorData):
             None,
             anova_status["system-info"]["firmware-version"],
             None,
-            "Mode",
+            "Firmware Version",
         )
         self.update_sensor(
             str(AnovaPrecisionCookerSensor.HEATER_TEMPERATURE),
@@ -113,7 +113,7 @@ class AnovaPrecisionCooker(SensorData):
             str(AnovaPrecisionCookerBinarySensor.COOKING),
             anova_status["job"]["mode"] == "COOK",
             None,
-            "Water Temperature Too High",
+            "Cooking",
         )
         self.update_binary_sensor(
             str(AnovaPrecisionCookerBinarySensor.DEVICE_SAFE),
