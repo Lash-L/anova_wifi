@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.2 (2023-01-19)
+### Fix
+* Removed unneeded asyncio import ([`da2f2e0`](https://github.com/conway220/anova_wifi/commit/da2f2e0124aacd7bef48cd473c123a4330ee5534))
+* Remove stale asyncio run ([`8a11635`](https://github.com/conway220/anova_wifi/commit/8a116357fccfea2c1cdd7b4eaba9a04891c22632))
+
 ## v0.2.1 (2023-01-19)
 ### Fix
 * Pytest-asyncio dependency issue ([`b80d9dd`](https://github.com/conway220/anova_wifi/commit/b80d9dd23e8a05137ef263bb2db488698dcb9ec8))
