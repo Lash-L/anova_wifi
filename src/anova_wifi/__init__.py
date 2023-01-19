@@ -1,3 +1,4 @@
+from .exceptions import AnovaOffline
 from .parser import (
     AnovaPrecisionCooker,
     AnovaPrecisionCookerBinarySensor,
@@ -10,4 +11,5 @@ __all__ = [
     "AnovaPrecisionCooker",
     "AnovaPrecisionCookerBinarySensor",
     "AnovaPrecisionCookerSensor",
+    "AnovaOffline",
 ]
