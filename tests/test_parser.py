@@ -68,7 +68,6 @@ async def test_async_data_1(json_mocked):
     apc = AnovaPrecisionCooker()
     json_mocked.return_value = dataset_one
     result = await apc.update("")
-    print(result)
     assert result == {
         "sensors": {
             AnovaPrecisionCookerSensor.COOK_TIME: 0,
