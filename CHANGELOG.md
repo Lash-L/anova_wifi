@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.1 (2023-01-19)
+### Fix
+* Pytest-asyncio dependency issue ([`b80d9dd`](https://github.com/conway220/anova_wifi/commit/b80d9dd23e8a05137ef263bb2db488698dcb9ec8))
+* Aiohttp dependency issue ([`171ddfd`](https://github.com/conway220/anova_wifi/commit/171ddfd5d5f54c9d2e497908bdd91e1e07b1db72))
+
 ## v0.2.0 (2023-01-19)
 ### Feature
 * Simplified and reworked parser ([`894f97f`](https://github.com/conway220/anova_wifi/commit/894f97fb63fc4bc5f77ac91037142e32680185ff))
