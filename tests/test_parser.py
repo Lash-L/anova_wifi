@@ -1,23 +1,12 @@
-import asyncio
-from asyncio import Future
 from unittest import mock
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from sensor_state_data import (
-    BinarySensorDescription,
-    BinarySensorValue,
-    DeviceKey,
-    SensorDescription,
-    SensorDeviceClass,
-    SensorDeviceInfo,
-    SensorUpdate,
-    SensorValue,
-    Units,
-)
 
-from anova_wifi.parser import AnovaPrecisionCooker, AnovaPrecisionCookerSensor, AnovaPrecisionCookerBinarySensor
-from tests import MockResponse
+from anova_wifi.parser import (
+    AnovaPrecisionCooker,
+    AnovaPrecisionCookerBinarySensor,
+    AnovaPrecisionCookerSensor,
+)
 
 dataset_one = [
     {
@@ -72,6 +61,7 @@ dataset_one = [
 def test_can_create():
     AnovaPrecisionCooker()
 
+
 @pytest.mark.asyncio
 @mock.patch("anova_wifi.parser.aiohttp.ClientResponse.json")
 async def test_async_data_1(json_mocked):
@@ -80,25 +70,22 @@ async def test_async_data_1(json_mocked):
     result = await apc.update("")
     print(result)
     assert result == {
-                    'sensors':
-                {
-                    AnovaPrecisionCookerSensor.COOK_TIME: 0,
-                    AnovaPrecisionCookerSensor.MODE: "IDLE",
-                    AnovaPrecisionCookerSensor.STATE: "",
-                    AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: 54.72,
-                    AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: 0,
-                    AnovaPrecisionCookerSensor.FIRMWARE_VERSION: "2.2.0",
-                    AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: 22.37,
-                    AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: 36.04,
-                    AnovaPrecisionCookerSensor.WATER_TEMPERATURE: 18.33
-                },
-            'binary_sensors':
-                {
-                    AnovaPrecisionCookerBinarySensor.COOKING: False,
-                    AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: False,
-                    AnovaPrecisionCookerBinarySensor.WATER_LEAK: False,
-                    AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: False,
-                    AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: False
-                }
-
+        "sensors": {
+            AnovaPrecisionCookerSensor.COOK_TIME: 0,
+            AnovaPrecisionCookerSensor.MODE: "IDLE",
+            AnovaPrecisionCookerSensor.STATE: "",
+            AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: 54.72,
+            AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: 0,
+            AnovaPrecisionCookerSensor.FIRMWARE_VERSION: "2.2.0",
+            AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: 22.37,
+            AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: 36.04,
+            AnovaPrecisionCookerSensor.WATER_TEMPERATURE: 18.33,
+        },
+        "binary_sensors": {
+            AnovaPrecisionCookerBinarySensor.COOKING: False,
+            AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: False,
+            AnovaPrecisionCookerBinarySensor.WATER_LEAK: False,
+            AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: False,
+            AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: False,
+        },
     }
