@@ -90,6 +90,3 @@ class AnovaPrecisionCooker:
     @staticmethod
     def discover() -> None:
         pass
-
-
-asyncio.run(AnovaPrecisionCooker().update("B8stXNzd6U2iNajKgzbn1p"))
