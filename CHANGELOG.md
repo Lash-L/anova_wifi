@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.4 (2023-01-19)
+### Fix
+* Removed unused types-requests ([`5e62cae`](https://github.com/conway220/anova_wifi/commit/5e62cae32fbb0c6c0e7d092174762f387551eb01))
+
 ## v0.2.3 (2023-01-19)
 ### Fix
 * Added export for error ([`e4b2c32`](https://github.com/conway220/anova_wifi/commit/e4b2c3293db39184d4d944da9b8510131163ae6c))
