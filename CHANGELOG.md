@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.3 (2023-01-19)
+### Fix
+* Added export for error ([`e4b2c32`](https://github.com/conway220/anova_wifi/commit/e4b2c3293db39184d4d944da9b8510131163ae6c))
+
 ## v0.2.2 (2023-01-19)
 ### Fix
 * Removed unneeded asyncio import ([`da2f2e0`](https://github.com/conway220/anova_wifi/commit/da2f2e0124aacd7bef48cd473c123a4330ee5534))
