@@ -4,6 +4,8 @@ from typing import Any
 import aiohttp
 from sensor_state_data.enum import StrEnum
 
+from anova_wifi.exceptions import AnovaOffline
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -32,12 +34,15 @@ class AnovaPrecisionCooker:
         super().__init__()
 
     async def update(self, device_key: str) -> dict[str, dict[str, Any]]:
-        async with aiohttp.ClientSession() as session:
-            http_response = await session.get(
-                f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
-            )
-            anova_status_json = await http_response.json()
-        anova_status = anova_status_json[0].get("body")
+        try:
+            async with aiohttp.ClientSession() as session:
+                http_response = await session.get(
+                    f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
+                )
+                anova_status_json = await http_response.json()
+            anova_status = anova_status_json[0].get("body")
+        except (IndexError, aiohttp.ClientConnectorError):
+            raise AnovaOffline()
         return {
             "sensors": {
                 AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"][

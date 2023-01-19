@@ -1,0 +1,2 @@
+class AnovaOffline(Exception):
+    pass
