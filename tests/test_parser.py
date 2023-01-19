@@ -1,5 +1,9 @@
+import asyncio
+from asyncio import Future
 from unittest import mock
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from sensor_state_data import (
     BinarySensorDescription,
     BinarySensorValue,
@@ -12,7 +16,7 @@ from sensor_state_data import (
     Units,
 )
 
-from anova_wifi.parser import AnovaPrecisionCooker
+from anova_wifi.parser import AnovaPrecisionCooker, AnovaPrecisionCookerSensor, AnovaPrecisionCookerBinarySensor
 from tests import MockResponse
 
 dataset_one = [
@@ -68,169 +72,33 @@ dataset_one = [
 def test_can_create():
     AnovaPrecisionCooker()
 
-
-@mock.patch("anova_wifi.parser.requests.get")
-def test_data_1(requests_mocked):
+@pytest.mark.asyncio
+@mock.patch("anova_wifi.parser.aiohttp.ClientResponse.json")
+async def test_async_data_1(json_mocked):
     apc = AnovaPrecisionCooker()
-    requests_mocked.return_value = MockResponse(json_data=dataset_one, status_code=200)
-    result = apc.update("")
+    json_mocked.return_value = dataset_one
+    result = await apc.update("")
     print(result)
-    assert result == SensorUpdate(
-        title=None,
-        devices={
-            None: SensorDeviceInfo(
-                name=None,
-                model=None,
-                manufacturer="Anova",
-                sw_version=None,
-                hw_version=None,
-            )
-        },
-        entity_descriptions={
-            DeviceKey(key="target_temperature", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="target_temperature", device_id=None),
-                device_class=SensorDeviceClass.TEMPERATURE,
-                native_unit_of_measurement=Units.TEMP_FAHRENHEIT,
-            ),
-            DeviceKey(key="state", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="state", device_id=None),
-                device_class=None,
-                native_unit_of_measurement=None,
-            ),
-            DeviceKey(key="cook_time", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="cook_time", device_id=None),
-                device_class=SensorDeviceClass.DURATION,
-                native_unit_of_measurement=Units.TIME_SECONDS,
-            ),
-            DeviceKey(key="mode", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="mode", device_id=None),
-                device_class=None,
-                native_unit_of_measurement=None,
-            ),
-            DeviceKey(key="cook_time_remaining", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="cook_time_remaining", device_id=None),
-                device_class=None,
-                native_unit_of_measurement=Units.TIME_SECONDS,
-            ),
-            DeviceKey(key="firmware_version", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="firmware_version", device_id=None),
-                device_class=None,
-                native_unit_of_measurement=None,
-            ),
-            DeviceKey(key="heater_temperature", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="heater_temperature", device_id=None),
-                device_class=SensorDeviceClass.TEMPERATURE,
-                native_unit_of_measurement=Units.TEMP_FAHRENHEIT,
-            ),
-            DeviceKey(key="triac_temperature", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="triac_temperature", device_id=None),
-                device_class=SensorDeviceClass.TEMPERATURE,
-                native_unit_of_measurement=Units.TEMP_FAHRENHEIT,
-            ),
-            DeviceKey(key="water_temperature", device_id=None): SensorDescription(
-                device_key=DeviceKey(key="water_temperature", device_id=None),
-                device_class=SensorDeviceClass.TEMPERATURE,
-                native_unit_of_measurement=Units.TEMP_FAHRENHEIT,
-            ),
-        },
-        entity_values={
-            DeviceKey(key="target_temperature", device_id=None): SensorValue(
-                device_key=DeviceKey(key="target_temperature", device_id=None),
-                name="Target Temperature",
-                native_value=54.72,
-            ),
-            DeviceKey(key="state", device_id=None): SensorValue(
-                device_key=DeviceKey(key="state", device_id=None),
-                name="State",
-                native_value="",
-            ),
-            DeviceKey(key="cook_time", device_id=None): SensorValue(
-                device_key=DeviceKey(key="cook_time", device_id=None),
-                name="Cook Time",
-                native_value=0,
-            ),
-            DeviceKey(key="mode", device_id=None): SensorValue(
-                device_key=DeviceKey(key="mode", device_id=None),
-                name="Mode",
-                native_value="IDLE",
-            ),
-            DeviceKey(key="cook_time_remaining", device_id=None): SensorValue(
-                device_key=DeviceKey(key="cook_time_remaining", device_id=None),
-                name="Cook Time Remaining",
-                native_value=0,
-            ),
-            DeviceKey(key="firmware_version", device_id=None): SensorValue(
-                device_key=DeviceKey(key="firmware_version", device_id=None),
-                name="Firmware Version",
-                native_value="2.2.0",
-            ),
-            DeviceKey(key="heater_temperature", device_id=None): SensorValue(
-                device_key=DeviceKey(key="heater_temperature", device_id=None),
-                name="Heater Temperature",
-                native_value=22.37,
-            ),
-            DeviceKey(key="triac_temperature", device_id=None): SensorValue(
-                device_key=DeviceKey(key="triac_temperature", device_id=None),
-                name="Triac Temperature",
-                native_value=36.04,
-            ),
-            DeviceKey(key="water_temperature", device_id=None): SensorValue(
-                device_key=DeviceKey(key="water_temperature", device_id=None),
-                name="Water Temperature",
-                native_value=18.33,
-            ),
-        },
-        binary_entity_descriptions={
-            DeviceKey(key="cooking", device_id=None): BinarySensorDescription(
-                device_key=DeviceKey(key="cooking", device_id=None), device_class=None
-            ),
-            DeviceKey(key="device_safe", device_id=None): BinarySensorDescription(
-                device_key=DeviceKey(key="device_safe", device_id=None),
-                device_class=None,
-            ),
-            DeviceKey(key="water_leak", device_id=None): BinarySensorDescription(
-                device_key=DeviceKey(key="water_leak", device_id=None),
-                device_class=None,
-            ),
-            DeviceKey(
-                key="water_level_critical", device_id=None
-            ): BinarySensorDescription(
-                device_key=DeviceKey(key="water_level_critical", device_id=None),
-                device_class=None,
-            ),
-            DeviceKey(
-                key="water_temp_too_high", device_id=None
-            ): BinarySensorDescription(
-                device_key=DeviceKey(key="water_temp_too_high", device_id=None),
-                device_class=None,
-            ),
-        },
-        binary_entity_values={
-            DeviceKey(key="cooking", device_id=None): BinarySensorValue(
-                device_key=DeviceKey(key="cooking", device_id=None),
-                name="Cooking",
-                native_value=False,
-            ),
-            DeviceKey(key="device_safe", device_id=None): BinarySensorValue(
-                device_key=DeviceKey(key="device_safe", device_id=None),
-                name="Device Safe",
-                native_value=False,
-            ),
-            DeviceKey(key="water_leak", device_id=None): BinarySensorValue(
-                device_key=DeviceKey(key="water_leak", device_id=None),
-                name="Water Leak",
-                native_value=False,
-            ),
-            DeviceKey(key="water_level_critical", device_id=None): BinarySensorValue(
-                device_key=DeviceKey(key="water_level_critical", device_id=None),
-                name="Water Level Critical",
-                native_value=False,
-            ),
-            DeviceKey(key="water_temp_too_high", device_id=None): BinarySensorValue(
-                device_key=DeviceKey(key="water_temp_too_high", device_id=None),
-                name="Water Temperature Too High",
-                native_value=False,
-            ),
-        },
-        events={},
-    )
+    assert result == {
+                    'sensors':
+                {
+                    AnovaPrecisionCookerSensor.COOK_TIME: 0,
+                    AnovaPrecisionCookerSensor.MODE: "IDLE",
+                    AnovaPrecisionCookerSensor.STATE: "",
+                    AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: 54.72,
+                    AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: 0,
+                    AnovaPrecisionCookerSensor.FIRMWARE_VERSION: "2.2.0",
+                    AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: 22.37,
+                    AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: 36.04,
+                    AnovaPrecisionCookerSensor.WATER_TEMPERATURE: 18.33
+                },
+            'binary_sensors':
+                {
+                    AnovaPrecisionCookerBinarySensor.COOKING: False,
+                    AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: False,
+                    AnovaPrecisionCookerBinarySensor.WATER_LEAK: False,
+                    AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: False,
+                    AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: False
+                }
+
+    }

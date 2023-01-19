@@ -1,7 +1,8 @@
+import asyncio
 import logging
 
-import requests
-from sensor_state_data import SensorData, SensorDeviceClass, Units
+import aiohttp
+from sensor_state_data import SensorData, SensorDeviceClass, Units, SensorUpdate
 from sensor_state_data.enum import StrEnum
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,117 +28,44 @@ class AnovaPrecisionCookerBinarySensor(StrEnum):
     WATER_TEMP_TOO_HIGH = "water_temp_too_high"
 
 
-TEMP_MAP = {"F": Units.TEMP_FAHRENHEIT, "C": Units.TEMP_CELSIUS}
-
-
-class AnovaPrecisionCooker(SensorData):
+class AnovaPrecisionCooker:
     def __init__(self) -> None:
         super().__init__()
 
-    def _start_update(self, device_key: str) -> None:
-        anova_status = (
-            requests.get(
-                f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
+    async def update(self, device_key: str) -> dict:
+        async with aiohttp.ClientSession() as session:
+            http_response = (
+               await session.get(
+                    f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
+                )
             )
-            .json()[0]
-            .get("body")
-        )
-        self.set_device_manufacturer("Anova")
-        temp_unit = TEMP_MAP.get(anova_status["job"]["temperature-unit"])
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.COOK_TIME),
-            Units.TIME_SECONDS,
-            anova_status["job"]["cook-time-seconds"],
-            SensorDeviceClass.DURATION,
-            "Cook Time",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.MODE),
-            None,
-            anova_status["job"]["mode"],
-            None,
-            "Mode",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.STATE),
-            None,
-            anova_status["job-status"]["state"],
-            None,
-            "State",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.TARGET_TEMPERATURE),
-            temp_unit,
-            anova_status["job"]["target-temperature"],
-            SensorDeviceClass.TEMPERATURE,
-            "Target Temperature",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.COOK_TIME_REMAINING),
-            Units.TIME_SECONDS,
-            anova_status["job-status"]["cook-time-remaining"],
-            None,
-            "Cook Time Remaining",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.FIRMWARE_VERSION),
-            None,
-            anova_status["system-info"]["firmware-version"],
-            None,
-            "Firmware Version",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.HEATER_TEMPERATURE),
-            temp_unit,
-            anova_status["temperature-info"]["heater-temperature"],
-            SensorDeviceClass.TEMPERATURE,
-            "Heater Temperature",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE),
-            temp_unit,
-            anova_status["temperature-info"]["triac-temperature"],
-            SensorDeviceClass.TEMPERATURE,
-            "Triac Temperature",
-        )
-        self.update_sensor(
-            str(AnovaPrecisionCookerSensor.WATER_TEMPERATURE),
-            temp_unit,
-            anova_status["temperature-info"]["water-temperature"],
-            SensorDeviceClass.TEMPERATURE,
-            "Water Temperature",
-        )
-        self.update_binary_sensor(
-            str(AnovaPrecisionCookerBinarySensor.COOKING),
-            anova_status["job"]["mode"] == "COOK",
-            None,
-            "Cooking",
-        )
-        self.update_binary_sensor(
-            str(AnovaPrecisionCookerBinarySensor.DEVICE_SAFE),
-            anova_status["pin-info"]["device-safe"] == 1,
-            None,
-            "Device Safe",
-        )
-        self.update_binary_sensor(
-            str(AnovaPrecisionCookerBinarySensor.WATER_LEAK),
-            anova_status["pin-info"]["water-leak"] == 1,
-            None,
-            "Water Leak",
-        )
-        self.update_binary_sensor(
-            str(AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL),
-            anova_status["pin-info"]["water-level-critical"] == 1,
-            None,
-            "Water Level Critical",
-        )
-        self.update_binary_sensor(
-            str(AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH),
-            anova_status["pin-info"]["water-temp-too-high"] == 1,
-            None,
-            "Water Temperature Too High",
-        )
+            anova_status_json = await http_response.json()
+        anova_status = anova_status_json[0].get("body")
+        return {
+            'sensors':
+                {
+                    AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"]["cook-time-seconds"],
+                    AnovaPrecisionCookerSensor.MODE: anova_status["job"]["mode"],
+                    AnovaPrecisionCookerSensor.STATE: anova_status["job-status"]["state"],
+                    AnovaPrecisionCookerSensor.TARGET_TEMPERATURE:anova_status["job"]["target-temperature"],
+                    AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: anova_status["job-status"]["cook-time-remaining"],
+                    AnovaPrecisionCookerSensor.FIRMWARE_VERSION: anova_status["system-info"]["firmware-version"],
+                    AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: anova_status["temperature-info"]["heater-temperature"],
+                    AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: anova_status["temperature-info"]["triac-temperature"],
+                    AnovaPrecisionCookerSensor.WATER_TEMPERATURE: anova_status["temperature-info"]["water-temperature"]
+                },
+            'binary_sensors':
+                {
+                    AnovaPrecisionCookerBinarySensor.COOKING: anova_status["job"]["mode"] == "COOK",
+                    AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: anova_status["pin-info"]["device-safe"] == 1,
+                    AnovaPrecisionCookerBinarySensor.WATER_LEAK: anova_status["pin-info"]["water-leak"] == 1,
+                    AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: anova_status["pin-info"]["water-level-critical"] == 1,
+                    AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: anova_status["pin-info"]["water-temp-too-high"] == 1
+                }
+        }
 
     @staticmethod
     def discover() -> None:
         pass
+
+asyncio.run(AnovaPrecisionCooker().update("B8stXNzd6U2iNajKgzbn1p"))
