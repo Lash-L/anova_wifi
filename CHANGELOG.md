@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2023-01-19)
+### Feature
+* Simplified and reworked parser ([`894f97f`](https://github.com/conway220/anova_wifi/commit/894f97fb63fc4bc5f77ac91037142e32680185ff))
+
+### Fix
+* Idea files pre-commit ([`a9e5b5d`](https://github.com/conway220/anova_wifi/commit/a9e5b5d16b05e5c5e8a4e790eece76b1f2a2bc56))
+* Resolved pre-commit issues ([`e0c22e6`](https://github.com/conway220/anova_wifi/commit/e0c22e6415a85e9048e7c2a481c8a600df30a5a4))
+
 ## v0.1.2 (2023-01-18)
 ### Fix
 * Changing requests version for HA ([`ac36315`](https://github.com/conway220/anova_wifi/commit/ac36315fc4239b9816ca244d66c267434f703bd5))
