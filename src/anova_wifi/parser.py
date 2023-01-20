@@ -29,17 +29,13 @@ class AnovaPrecisionCookerBinarySensor(StrEnum):
     WATER_TEMP_TOO_HIGH = "water_temp_too_high"
 
 
-MODE_MAP = {
-    "IDLE": "Idle",
-    "COOK": "Cook",
-    "LOW WATER": "Low water"
-}
+MODE_MAP = {"IDLE": "Idle", "COOK": "Cook", "LOW WATER": "Low water"}
 
 STATE_MAP = {
     "PREHEATING": "Preheating",
     "COOKING": "Cooking",
     "MAINTAINING": "Maintaining",
-    "": "No state"
+    "": "No state",
 }
 
 
@@ -62,8 +58,13 @@ class AnovaPrecisionCooker:
                 AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"][
                     "cook-time-seconds"
                 ],
-                AnovaPrecisionCookerSensor.MODE: MODE_MAP.get(anova_status["job"]["mode"], anova_status["job"]["mode"]),
-                AnovaPrecisionCookerSensor.STATE: STATE_MAP.get(anova_status["job-status"]["state"],anova_status["job-status"]["state"]),
+                AnovaPrecisionCookerSensor.MODE: MODE_MAP.get(
+                    anova_status["job"]["mode"], anova_status["job"]["mode"]
+                ),
+                AnovaPrecisionCookerSensor.STATE: STATE_MAP.get(
+                    anova_status["job-status"]["state"],
+                    anova_status["job-status"]["state"],
+                ),
                 AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: anova_status["job"][
                     "target-temperature"
                 ],
