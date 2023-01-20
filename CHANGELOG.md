@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.5 (2023-01-20)
+### Fix
+* Added low water mode ([`3c755d2`](https://github.com/conway220/anova_wifi/commit/3c755d21fca546f866d91d8f1a668588192725c7))
+* Made state and mode go to map ([`48cbe07`](https://github.com/conway220/anova_wifi/commit/48cbe07958f51a228a120ca0be160489a26e7fd5))
+
 ## v0.2.4 (2023-01-19)
 ### Fix
 * Removed unused types-requests ([`5e62cae`](https://github.com/conway220/anova_wifi/commit/5e62cae32fbb0c6c0e7d092174762f387551eb01))
