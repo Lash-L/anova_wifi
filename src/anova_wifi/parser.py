@@ -31,7 +31,8 @@ class AnovaPrecisionCookerBinarySensor(StrEnum):
 
 MODE_MAP = {
     "IDLE": "Idle",
-    "COOK": "Cook"
+    "COOK": "Cook",
+    "LOW WATER": "Low water"
 }
 
 STATE_MAP = {
