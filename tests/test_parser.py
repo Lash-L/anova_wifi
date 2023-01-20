@@ -71,8 +71,8 @@ async def test_async_data_1(json_mocked):
     assert result == {
         "sensors": {
             AnovaPrecisionCookerSensor.COOK_TIME: 0,
-            AnovaPrecisionCookerSensor.MODE: "IDLE",
-            AnovaPrecisionCookerSensor.STATE: "",
+            AnovaPrecisionCookerSensor.MODE: "Idle",
+            AnovaPrecisionCookerSensor.STATE: "No state",
             AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: 54.72,
             AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: 0,
             AnovaPrecisionCookerSensor.FIRMWARE_VERSION: "2.2.0",
