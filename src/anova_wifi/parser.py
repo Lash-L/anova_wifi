@@ -55,8 +55,9 @@ class AnovaPrecisionCooker:
             raise AnovaOffline()
         system_info = "system-info"
         for key in anova_status.keys():
-            if "system-info" in key and "details" not in key:
+            if "system-info" in key and "details" not in key and "nxp" not in key:
                 system_info = key
+                break
         return {
             "sensors": {
                 AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"][
