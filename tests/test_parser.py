@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 
+from anova_wifi import AnovaOffline
 from anova_wifi.parser import (
     AnovaPrecisionCooker,
     AnovaPrecisionCookerBinarySensor,
@@ -88,3 +89,11 @@ async def test_async_data_1(json_mocked):
             AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: False,
         },
     }
+
+
+@pytest.mark.asyncio
+async def test_async_no_return():
+    apc = AnovaPrecisionCooker()
+    with pytest.raises(AnovaOffline):
+        await apc.update("f")
+
