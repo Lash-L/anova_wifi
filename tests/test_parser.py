@@ -96,4 +96,3 @@ async def test_async_no_return():
     apc = AnovaPrecisionCooker()
     with pytest.raises(AnovaOffline):
         await apc.update("f")
-

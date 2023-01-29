@@ -50,12 +50,12 @@ class AnovaPrecisionCooker:
                     f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
                 )
                 anova_status_json = await http_response.json()
-            anova_status: dict = anova_status_json[0].get("body")
+            anova_status = anova_status_json[0].get("body")
         except (IndexError, aiohttp.ClientConnectorError):
             raise AnovaOffline()
-        system_info = 'system-info'
+        system_info = "system-info"
         for key in anova_status.keys():
-            if 'system-info' in key and 'details' not in key:
+            if "system-info" in key and "details" not in key:
                 system_info = key
         return {
             "sensors": {
@@ -75,9 +75,9 @@ class AnovaPrecisionCooker:
                 AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: anova_status[
                     "job-status"
                 ]["cook-time-remaining"],
-                AnovaPrecisionCookerSensor.FIRMWARE_VERSION: anova_status[
-                    system_info
-                ]["firmware-version"],
+                AnovaPrecisionCookerSensor.FIRMWARE_VERSION: anova_status[system_info][
+                    "firmware-version"
+                ],
                 AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: anova_status[
                     "temperature-info"
                 ]["heater-temperature"],
