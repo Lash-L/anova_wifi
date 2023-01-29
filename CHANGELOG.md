@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.6 (2023-01-29)
+### Fix
+* Updated isort ([`f104362`](https://github.com/Lash-L/anova_wifi/commit/f1043629d74b0340792557494d11ed13dd0f2ecb))
+* Pre commit ([`798f44b`](https://github.com/Lash-L/anova_wifi/commit/798f44bdeea081dd728502d8385dad167acc4379))
+* Poetry version issue ([`b9813a2`](https://github.com/Lash-L/anova_wifi/commit/b9813a2f9cf1487511213cd56aeecb6bd11b0cd2))
+* Added support for an500-us00 ([`b555b8b`](https://github.com/Lash-L/anova_wifi/commit/b555b8b1905b0b31ad6908da116faae316d5ad44))
+
 ## v0.2.5 (2023-01-20)
 ### Fix
 * Added low water mode ([`3c755d2`](https://github.com/conway220/anova_wifi/commit/3c755d21fca546f866d91d8f1a668588192725c7))
