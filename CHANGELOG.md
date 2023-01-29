@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.7 (2023-01-29)
+### Fix
+* Removed "nxp" from system info key options ([`b7c5a64`](https://github.com/Lash-L/anova_wifi/commit/b7c5a648fbb87746d85cd83cc3fb57e09fb081b3))
+
 ## v0.2.6 (2023-01-29)
 ### Fix
 * Updated isort ([`f104362`](https://github.com/Lash-L/anova_wifi/commit/f1043629d74b0340792557494d11ed13dd0f2ecb))
