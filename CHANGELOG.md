@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2023-02-21)
+### Feature
+* Added support for passing clientsession ([`d834ec9`](https://github.com/Lash-L/anova_wifi/commit/d834ec97340fcef9df24f317a212d91380013bfb))
+
+### Fix
+* Bump semantic release ([`c98a71a`](https://github.com/Lash-L/anova_wifi/commit/c98a71a4bc110b9b241bb82698534bc225d6cbb5))
+
 ## v0.2.7 (2023-01-29)
 ### Fix
 * Removed "nxp" from system info key options ([`b7c5a64`](https://github.com/Lash-L/anova_wifi/commit/b7c5a648fbb87746d85cd83cc3fb57e09fb081b3))
