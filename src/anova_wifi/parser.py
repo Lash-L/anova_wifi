@@ -40,12 +40,12 @@ STATE_MAP = {
 
 
 class AnovaPrecisionCooker:
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, session: aiohttp.ClientSession) -> None:
+        self.session = session
 
     async def update(self, device_key: str) -> dict[str, dict[str, Any]]:
         try:
-            async with aiohttp.ClientSession() as session:
+            async with self.session as session:
                 http_response = await session.get(
                     f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
                 )

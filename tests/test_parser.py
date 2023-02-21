@@ -1,5 +1,6 @@
 from unittest import mock
 
+import aiohttp
 import pytest
 
 from anova_wifi import AnovaOffline
@@ -60,13 +61,13 @@ dataset_one = [
 
 
 def test_can_create():
-    AnovaPrecisionCooker()
+    AnovaPrecisionCooker(aiohttp.ClientSession())
 
 
 @pytest.mark.asyncio
 @mock.patch("anova_wifi.parser.aiohttp.ClientResponse.json")
 async def test_async_data_1(json_mocked):
-    apc = AnovaPrecisionCooker()
+    apc = AnovaPrecisionCooker(aiohttp.ClientSession())
     json_mocked.return_value = dataset_one
     result = await apc.update("")
     assert result == {
@@ -93,6 +94,6 @@ async def test_async_data_1(json_mocked):
 
 @pytest.mark.asyncio
 async def test_async_no_return():
-    apc = AnovaPrecisionCooker()
+    apc = AnovaPrecisionCooker(aiohttp.ClientSession())
     with pytest.raises(AnovaOffline):
         await apc.update("f")
