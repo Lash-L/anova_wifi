@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.1 (2023-02-22)
+### Fix
+* Session tests ([`e0d0f7c`](https://github.com/Lash-L/anova_wifi/commit/e0d0f7cf1f8c848b8579d741be3570741bd065c2))
+* Repaired session getting closed ([`c8af5ea`](https://github.com/Lash-L/anova_wifi/commit/c8af5ea3a882d8f127bceac6a0f56ab5b19a7e83))
+
 ## v0.3.0 (2023-02-21)
 ### Feature
 * Added support for passing clientsession ([`d834ec9`](https://github.com/Lash-L/anova_wifi/commit/d834ec97340fcef9df24f317a212d91380013bfb))
