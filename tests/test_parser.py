@@ -60,40 +60,44 @@ dataset_one = [
 ]
 
 
-def test_can_create():
-    AnovaPrecisionCooker(aiohttp.ClientSession())
+@pytest.mark.asyncio
+async def test_can_create():
+    async with aiohttp.ClientSession() as session:
+        AnovaPrecisionCooker(session)
 
 
 @pytest.mark.asyncio
 @mock.patch("anova_wifi.parser.aiohttp.ClientResponse.json")
 async def test_async_data_1(json_mocked):
-    apc = AnovaPrecisionCooker(aiohttp.ClientSession())
-    json_mocked.return_value = dataset_one
-    result = await apc.update("")
-    assert result == {
-        "sensors": {
-            AnovaPrecisionCookerSensor.COOK_TIME: 0,
-            AnovaPrecisionCookerSensor.MODE: "Idle",
-            AnovaPrecisionCookerSensor.STATE: "No state",
-            AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: 54.72,
-            AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: 0,
-            AnovaPrecisionCookerSensor.FIRMWARE_VERSION: "2.2.0",
-            AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: 22.37,
-            AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: 36.04,
-            AnovaPrecisionCookerSensor.WATER_TEMPERATURE: 18.33,
-        },
-        "binary_sensors": {
-            AnovaPrecisionCookerBinarySensor.COOKING: False,
-            AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: False,
-            AnovaPrecisionCookerBinarySensor.WATER_LEAK: False,
-            AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: False,
-            AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: False,
-        },
-    }
+    async with aiohttp.ClientSession() as session:
+        apc = AnovaPrecisionCooker(session)
+        json_mocked.return_value = dataset_one
+        result = await apc.update("")
+        assert result == {
+            "sensors": {
+                AnovaPrecisionCookerSensor.COOK_TIME: 0,
+                AnovaPrecisionCookerSensor.MODE: "Idle",
+                AnovaPrecisionCookerSensor.STATE: "No state",
+                AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: 54.72,
+                AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: 0,
+                AnovaPrecisionCookerSensor.FIRMWARE_VERSION: "2.2.0",
+                AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: 22.37,
+                AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: 36.04,
+                AnovaPrecisionCookerSensor.WATER_TEMPERATURE: 18.33,
+            },
+            "binary_sensors": {
+                AnovaPrecisionCookerBinarySensor.COOKING: False,
+                AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: False,
+                AnovaPrecisionCookerBinarySensor.WATER_LEAK: False,
+                AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: False,
+                AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: False,
+            },
+        }
 
 
 @pytest.mark.asyncio
 async def test_async_no_return():
-    apc = AnovaPrecisionCooker(aiohttp.ClientSession())
-    with pytest.raises(AnovaOffline):
-        await apc.update("f")
+    async with aiohttp.ClientSession() as session:
+        apc = AnovaPrecisionCooker(session)
+        with pytest.raises(AnovaOffline):
+            await apc.update("f")
