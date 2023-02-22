@@ -45,11 +45,10 @@ class AnovaPrecisionCooker:
 
     async def update(self, device_key: str) -> dict[str, dict[str, Any]]:
         try:
-            async with self.session as session:
-                http_response = await session.get(
-                    f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
-                )
-                anova_status_json = await http_response.json()
+            http_response = await self.session.get(
+                f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
+            )
+            anova_status_json = await http_response.json()
             anova_status = anova_status_json[0].get("body")
         except (IndexError, aiohttp.ClientConnectorError):
             raise AnovaOffline()
