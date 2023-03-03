@@ -134,7 +134,7 @@ class AnovaPrecisionOvenBinarySensor(StrEnum):
     REAR_HEATING = "rear_heating"
 
 
-class AnovaPrecissionOven:
+class AnovaPrecisionOven:
     def __init__(self, session: aiohttp.ClientSession, username: str, password: str):
         self.session = session
         self.username = username
