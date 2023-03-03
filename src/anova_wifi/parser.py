@@ -1,7 +1,9 @@
+import datetime
 import logging
 from typing import Any
 
 import aiohttp
+from aiohttp import ClientWebSocketResponse
 from sensor_state_data.enum import StrEnum
 
 from anova_wifi.exceptions import AnovaOffline
@@ -29,9 +31,9 @@ class AnovaPrecisionCookerBinarySensor(StrEnum):
     WATER_TEMP_TOO_HIGH = "water_temp_too_high"
 
 
-MODE_MAP = {"IDLE": "Idle", "COOK": "Cook", "LOW WATER": "Low water"}
+SOUS_VIDE_MODE_MAP = {"IDLE": "Idle", "COOK": "Cook", "LOW WATER": "Low water"}
 
-STATE_MAP = {
+SOUS_VIDE_STATE_MAP = {
     "PREHEATING": "Preheating",
     "COOKING": "Cooking",
     "MAINTAINING": "Maintaining",
@@ -62,10 +64,10 @@ class AnovaPrecisionCooker:
                 AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"][
                     "cook-time-seconds"
                 ],
-                AnovaPrecisionCookerSensor.MODE: MODE_MAP.get(
+                AnovaPrecisionCookerSensor.MODE: SOUS_VIDE_MODE_MAP.get(
                     anova_status["job"]["mode"], anova_status["job"]["mode"]
                 ),
-                AnovaPrecisionCookerSensor.STATE: STATE_MAP.get(
+                AnovaPrecisionCookerSensor.STATE: SOUS_VIDE_STATE_MAP.get(
                     anova_status["job-status"]["state"],
                     anova_status["job-status"]["state"],
                 ),
@@ -113,3 +115,53 @@ class AnovaPrecisionCooker:
     @staticmethod
     def discover() -> None:
         pass
+
+class AnovaPrecisionOvenSensor(StrEnum):
+    COOKER_ID = "cooker_id"
+    STAGE_TYPE = "stage_type"
+    FAN_SPEED = "fan_speed"
+    RACK_POSITION = "rack_position"
+    STAGE_MODE = "stage_mode"
+    STAGE_TEMPERATURE = "stage_temperature"
+    STEAM_GENERATOR_MODE = "steam_generator_mode"
+    STEAM_GENERATOR_HUMIDITY = "steam_generator_humidity"
+
+
+class AnovaPrecisionOvenBinarySensor(StrEnum):
+    VENT = "vent"
+    TOP_HEATING = "top_heating"
+    BOTTOM_HEATING = "bottom_heating"
+    REAR_HEATING = "rear_heating"
+
+
+class AnovaPrecissionOven:
+    def __init__(self, session: aiohttp.ClientSession, username: str, password: str):
+        self.session = session
+        self.username = username
+        self.password = password
+        self.authentication_token: str | None = None
+        self.authentication_expiration: datetime.datetime = datetime.datetime.now()
+        self.websocket_client: ClientWebSocketResponse | None = None
+
+    async def authenticate(self) -> bool:
+        """Authenticate with the Anova API"""
+        # If auth fails, raise invalid login
+        # If some other issue, raise Anova offline
+        pass
+
+    async def websocket_connect(self):
+        """I don't have much experience with websockets, but I know when you connect with ws_connect
+        aiohttp returns ClientWebSocketResponse that can then be used to communicate with the ws.
+        If we could just carry that response around that would be ideal, so that we don't have to constantly reconnect
+        """
+        pass
+
+    async def start_cook(self):
+        pass
+
+    async def stop_cook(self):
+        pass
+
+    async def parse_oven_state(self):
+        pass
+
