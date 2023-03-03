@@ -3,7 +3,7 @@ from .parser import (
     AnovaPrecisionCooker,
     AnovaPrecisionCookerBinarySensor,
     AnovaPrecisionCookerSensor,
-    AnovaPrecissionOven,
+    AnovaPrecisionOven,
     AnovaPrecisionOvenSensor,
     AnovaPrecisionOvenBinarySensor
 )
@@ -15,7 +15,7 @@ __all__ = [
     "AnovaPrecisionCookerBinarySensor",
     "AnovaPrecisionCookerSensor",
     "AnovaOffline",
-    "AnovaPrecissionOven",
+    "AnovaPrecisionOven",
     "AnovaPrecisionOvenBinarySensor",
     "AnovaPrecisionOvenSensor"
 ]
