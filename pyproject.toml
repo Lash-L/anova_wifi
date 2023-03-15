@@ -24,6 +24,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
+sensor-state-data = "^2.13.0"
 aiohttp = "^3.8.1"
 
 [tool.poetry.group.dev.dependencies]

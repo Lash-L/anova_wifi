@@ -1,14 +1,14 @@
 import secrets
 import string
-from enum import Enum
 from typing import Any
 
 import aiohttp
+from sensor_state_data.enum import StrEnum
 
 from anova_wifi.exceptions import AnovaException, AnovaOffline
 
 
-class AnovaPrecisionCookerSensor(Enum):
+class AnovaPrecisionCookerSensor(StrEnum):
     COOK_TIME = "cook_time"
     MODE = "mode"
     STATE = "state"
@@ -20,7 +20,7 @@ class AnovaPrecisionCookerSensor(Enum):
     WATER_TEMPERATURE = "water_temperature"
 
 
-class AnovaPrecisionCookerBinarySensor(Enum):
+class AnovaPrecisionCookerBinarySensor(StrEnum):
     COOKING = "cooking"
     DEVICE_SAFE = "device_safe"
     WATER_LEAK = "water_leak"
@@ -53,9 +53,7 @@ class AnovaPrecisionCooker:
 
     async def update(
         self,
-    ) -> dict[
-        str, dict[AnovaPrecisionCookerSensor | AnovaPrecisionCookerBinarySensor, Any]
-    ]:
+    ) -> dict[str, dict[str, Any]]:
         """Updates the Sous vide's data with a non-authenticated api call"""
         try:
             http_response = await self.session.get(
