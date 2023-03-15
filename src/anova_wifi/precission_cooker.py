@@ -45,7 +45,7 @@ class AnovaPrecisionCooker:
         self.session = session
         self.device_key = device_key
         self.type = type
-        self._jwt = jwt
+        self.jwt = jwt
         self.cook_time: float | None = None
         self.mode: str | None = None
         self.target_temperature: float | None = None
@@ -134,7 +134,7 @@ class AnovaPrecisionCooker:
         temperature_unit: str | None = None,
     ) -> None:
         """Builds an api call for the sous vide"""
-        if self._jwt is None:
+        if self.jwt is None:
             raise AnovaException("No JWT - ")
         json_req = {
             "cook-time-seconds": cook_time if cook_time is not None else self.cook_time,
@@ -152,7 +152,7 @@ class AnovaPrecisionCooker:
             if temperature_unit is not None
             else self.temperature_unit,
         }
-        anova_req_headers = {"authorization": "Bearer " + self._jwt}
+        anova_req_headers = {"authorization": "Bearer " + self.jwt}
         resp = await self.session.put(
             f"https://anovaculinary.io/devices/{self.device_key}/current-job",
             json=json_req,
