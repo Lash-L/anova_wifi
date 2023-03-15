@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.1 (2023-03-15)
+### Fix
+* Make api jwt public ([`ecc1a82`](https://github.com/Lash-L/anova_wifi/commit/ecc1a8275119f078129f1d5279b22b38aaefaf9a))
+* Make jwt public ([`0e237ab`](https://github.com/Lash-L/anova_wifi/commit/0e237ab8c6a6840a35635e3cbbb5e8de5d5f4f9e))
+
 ## v0.4.0 (2023-03-15)
 ### Feature
 * Add authentication ([`d0e4976`](https://github.com/Lash-L/anova_wifi/commit/d0e49760707460319054d082104bfcae648d80a1))
