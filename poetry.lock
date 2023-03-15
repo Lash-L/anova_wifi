@@ -926,6 +926,21 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "sensor-state-data"
+version = "2.14.0"
+description = "Models for storing and converting Sensor Data state"
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "sensor_state_data-2.14.0-py3-none-any.whl", hash = "sha256:c966f8e6ce004ef1f8350dbf380b6eebf93df98af412917f120b70fe1c583e88"},
+    {file = "sensor_state_data-2.14.0.tar.gz", hash = "sha256:48a9aa94d90a5b294aa204d942d55ddfd58285e8cf801dea7e2eb6ca4dee26e2"},
+]
+
+[package.extras]
+docs = ["Sphinx (>=5.0,<6.0)", "myst-parser (>=0.18,<0.19)", "sphinx-rtd-theme (>=1.0,<2.0)"]
+
+[[package]]
 name = "snowballstemmer"
 version = "2.2.0"
 description = "This package provides 29 stemmers for 28 languages generated from Snowball algorithms."
@@ -1222,4 +1237,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7c6dc0e2cde3e5cd07def2c2ae6e09bec5f5e55316e74fae2562b46375e6cf3e"
+content-hash = "86b0b92da2745904a8b51941275ad8ea70c99fc5ab254deec35570f24ab5d217"
