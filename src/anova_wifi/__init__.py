@@ -1,4 +1,4 @@
-from .exceptions import AnovaException, AnovaOffline, InvalidLogin
+from .exceptions import AnovaException, AnovaOffline, InvalidLogin, NoDevicesFound
 from .parser import AnovaApi
 from .precission_cooker import (
     AnovaPrecisionCooker,
@@ -16,4 +16,5 @@ __all__ = [
     "AnovaException",
     "InvalidLogin",
     "AnovaPrecisionCooker",
+    "NoDevicesFound",
 ]
