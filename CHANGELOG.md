@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.3 (2023-03-15)
+### Fix
+* Bump poetry lock ([`74c570d`](https://github.com/Lash-L/anova_wifi/commit/74c570dc4f555f2bf2dec6dcd6292412da26c8f5))
+* Change to strenum ([`9527641`](https://github.com/Lash-L/anova_wifi/commit/952764197b60a6400c8ae70a551da03068bf966e))
+
 ## v0.4.2 (2023-03-15)
 ### Fix
 * Add no devices found to init ([`4436113`](https://github.com/Lash-L/anova_wifi/commit/4436113550cae42d094587a8d5a31a247bc5fb6f))
