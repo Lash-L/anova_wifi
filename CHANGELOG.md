@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.2 (2023-03-15)
+### Fix
+* Add no devices found to init ([`4436113`](https://github.com/Lash-L/anova_wifi/commit/4436113550cae42d094587a8d5a31a247bc5fb6f))
+* Added timeout for getting devices ([`5671d3f`](https://github.com/Lash-L/anova_wifi/commit/5671d3f825a8474c1daef1a967abd8ab2b804d46))
+
 ## v0.4.1 (2023-03-15)
 ### Fix
 * Make api jwt public ([`ecc1a82`](https://github.com/Lash-L/anova_wifi/commit/ecc1a8275119f078129f1d5279b22b38aaefaf9a))
