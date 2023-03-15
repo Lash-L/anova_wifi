@@ -64,7 +64,9 @@ class AnovaPrecisionCooker:
             anova_status_json = await http_response.json()
             anova_status = anova_status_json[0].get("body")
         except (IndexError, aiohttp.ClientConnectorError):
-            raise AnovaOffline()
+            raise AnovaOffline(
+                "Cannot connect to sous vide - perhaps it is not online?"
+            )
         system_info = "system-info"
         for key in anova_status.keys():
             if "system-info" in key and "details" not in key and "nxp" not in key:

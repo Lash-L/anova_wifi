@@ -1,11 +1,13 @@
+import asyncio
 import json
 import logging
+import time
 import typing
 from typing import Tuple
 
 import aiohttp
 
-from anova_wifi.exceptions import AnovaException, InvalidLogin
+from anova_wifi.exceptions import AnovaException, InvalidLogin, NoDevicesFound
 from anova_wifi.precission_cooker import AnovaPrecisionCooker
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,21 +71,26 @@ class AnovaApi:
             raise AnovaException("Cannot get devices without first authenticating")
         url = f"https://devices.anovaculinary.io/?token={self._firebase_jwt}"
         user_devices = []
-        async with aiohttp.ClientSession() as session:
-            async with session.ws_connect(url) as ws:
-                async for msg in ws:
-                    # Filter messages based on the "command" field
-                    data = json.loads(msg.data)
-                    if data.get("command") == "EVENT_APC_WIFI_VERSION":
-                        payload = data.get("payload")
-                        devices: typing.List[Tuple[str, str]] = [
-                            (d["cookerId"], d["type"]) for d in payload
-                        ]
-                        for device in devices:
-                            user_devices.append(
-                                AnovaPrecisionCooker(
-                                    self.session, device[0], device[1], self.jwt
-                                )
+        timeout = time.time() + 5  # 5 seconds from now
+        async with self.session.ws_connect(url) as ws:
+            while time.time() < timeout:
+                try:
+                    msg = await ws.receive(4.5)
+                except asyncio.TimeoutError:
+                    raise NoDevicesFound("Found no devices on websocket")
+                # Filter messages based on the "command" field
+                data = json.loads(msg.data)
+                if data.get("command") == "EVENT_APC_WIFI_VERSION":
+                    payload = data.get("payload")
+                    devices: typing.List[Tuple[str, str]] = [
+                        (d["cookerId"], d["type"]) for d in payload
+                    ]
+                    for device in devices:
+                        user_devices.append(
+                            AnovaPrecisionCooker(
+                                self.session, device[0], device[1], self.jwt
                             )
-                        return user_devices
+                        )
+        if len(user_devices) == 0:
+            raise NoDevicesFound("Found no devices on the websocket")
         return user_devices

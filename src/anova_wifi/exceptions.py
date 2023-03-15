@@ -8,3 +8,7 @@ class AnovaOffline(AnovaException):
 
 class InvalidLogin(AnovaException):
     pass
+
+
+class NoDevicesFound(AnovaException):
+    pass
