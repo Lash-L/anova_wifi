@@ -24,7 +24,7 @@ class AnovaApi:
         self.session = session
         self.username = username
         self.password = password
-        self._jwt: str | None = None
+        self.jwt: str | None = None
         self._firebase_jwt: str | None = None
 
     async def authenticate(self) -> bool:
@@ -59,13 +59,13 @@ class AnovaApi:
             raise InvalidLogin("Could not authenticate with Anova")
 
         # Set JWT local variable
-        self._jwt = jwt
+        self.jwt = jwt
 
         return True
 
     async def get_devices(self) -> typing.List[AnovaPrecisionCooker]:
         """Get all devices by connecting to anova websocket"""
-        if self._firebase_jwt is None or self._jwt is None:
+        if self._firebase_jwt is None or self.jwt is None:
             raise AnovaException("Cannot get devices without first authenticating")
         url = f"https://devices.anovaculinary.io/?token={self._firebase_jwt}"
         user_devices = []
@@ -82,7 +82,7 @@ class AnovaApi:
                         for device in devices:
                             user_devices.append(
                                 AnovaPrecisionCooker(
-                                    self.session, device[0], device[1], self._jwt
+                                    self.session, device[0], device[1], self.jwt
                                 )
                             )
                         return user_devices
