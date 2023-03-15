@@ -1,5 +1,6 @@
-from .exceptions import AnovaOffline
-from .parser import (
+from .exceptions import AnovaException, AnovaOffline, InvalidLogin
+from .parser import AnovaApi
+from .precission_cooker import (
     AnovaPrecisionCooker,
     AnovaPrecisionCookerBinarySensor,
     AnovaPrecisionCookerSensor,
@@ -8,8 +9,11 @@ from .parser import (
 __version__ = "0.3.1"
 
 __all__ = [
-    "AnovaPrecisionCooker",
+    "AnovaApi",
     "AnovaPrecisionCookerBinarySensor",
     "AnovaPrecisionCookerSensor",
     "AnovaOffline",
+    "AnovaException",
+    "InvalidLogin",
+    "AnovaPrecisionCooker",
 ]

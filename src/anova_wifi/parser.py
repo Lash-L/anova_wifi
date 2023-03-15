@@ -1,115 +1,89 @@
+import json
 import logging
-from typing import Any
+import typing
+from typing import Tuple
 
 import aiohttp
-from sensor_state_data.enum import StrEnum
 
-from anova_wifi.exceptions import AnovaOffline
+from anova_wifi.exceptions import AnovaException, InvalidLogin
+from anova_wifi.precission_cooker import AnovaPrecisionCooker
 
 _LOGGER = logging.getLogger(__name__)
 
-
-class AnovaPrecisionCookerSensor(StrEnum):
-    COOK_TIME = "cook_time"
-    MODE = "mode"
-    STATE = "state"
-    TARGET_TEMPERATURE = "target_temperature"
-    COOK_TIME_REMAINING = "cook_time_remaining"
-    FIRMWARE_VERSION = "firmware_version"
-    HEATER_TEMPERATURE = "heater_temperature"
-    TRIAC_TEMPERATURE = "triac_temperature"
-    WATER_TEMPERATURE = "water_temperature"
+# Found here - https://github.com/ammarzuberi/pyanova-api/blob/master/anova/AnovaCooker.py and personally confirmed.
+ANOVA_FIREBASE_KEY = "AIzaSyDQiOP2fTR9zvFcag2kSbcmG9zPh6gZhHw"
 
 
-class AnovaPrecisionCookerBinarySensor(StrEnum):
-    COOKING = "cooking"
-    DEVICE_SAFE = "device_safe"
-    WATER_LEAK = "water_leak"
-    WATER_LEVEL_CRITICAL = "water_level_critical"
-    WATER_TEMP_TOO_HIGH = "water_temp_too_high"
+class AnovaApi:
+    """A class to handle communicating with the anova api to get devices"""
 
-
-MODE_MAP = {"IDLE": "Idle", "COOK": "Cook", "LOW WATER": "Low water"}
-
-STATE_MAP = {
-    "PREHEATING": "Preheating",
-    "COOKING": "Cooking",
-    "MAINTAINING": "Maintaining",
-    "": "No state",
-}
-
-
-class AnovaPrecisionCooker:
-    def __init__(self, session: aiohttp.ClientSession) -> None:
+    def __init__(
+        self, session: aiohttp.ClientSession, username: str, password: str
+    ) -> None:
+        """Creates an anova api class"""
         self.session = session
+        self.username = username
+        self.password = password
+        self._jwt: str | None = None
+        self._firebase_jwt: str | None = None
 
-    async def update(self, device_key: str) -> dict[str, dict[str, Any]]:
-        try:
-            http_response = await self.session.get(
-                f"https://anovaculinary.io/devices/{device_key}/states/?limit=1"
-            )
-            anova_status_json = await http_response.json()
-            anova_status = anova_status_json[0].get("body")
-        except (IndexError, aiohttp.ClientConnectorError):
-            raise AnovaOffline()
-        system_info = "system-info"
-        for key in anova_status.keys():
-            if "system-info" in key and "details" not in key and "nxp" not in key:
-                system_info = key
-                break
-        return {
-            "sensors": {
-                AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"][
-                    "cook-time-seconds"
-                ],
-                AnovaPrecisionCookerSensor.MODE: MODE_MAP.get(
-                    anova_status["job"]["mode"], anova_status["job"]["mode"]
-                ),
-                AnovaPrecisionCookerSensor.STATE: STATE_MAP.get(
-                    anova_status["job-status"]["state"],
-                    anova_status["job-status"]["state"],
-                ),
-                AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: anova_status["job"][
-                    "target-temperature"
-                ],
-                AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: anova_status[
-                    "job-status"
-                ]["cook-time-remaining"],
-                AnovaPrecisionCookerSensor.FIRMWARE_VERSION: anova_status[system_info][
-                    "firmware-version"
-                ],
-                AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: anova_status[
-                    "temperature-info"
-                ]["heater-temperature"],
-                AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: anova_status[
-                    "temperature-info"
-                ]["triac-temperature"],
-                AnovaPrecisionCookerSensor.WATER_TEMPERATURE: anova_status[
-                    "temperature-info"
-                ]["water-temperature"],
-            },
-            "binary_sensors": {
-                AnovaPrecisionCookerBinarySensor.COOKING: anova_status["job"]["mode"]
-                == "COOK",
-                AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: anova_status["pin-info"][
-                    "device-safe"
-                ]
-                == 1,
-                AnovaPrecisionCookerBinarySensor.WATER_LEAK: anova_status["pin-info"][
-                    "water-leak"
-                ]
-                == 1,
-                AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: anova_status[
-                    "pin-info"
-                ]["water-level-critical"]
-                == 1,
-                AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: anova_status[
-                    "pin-info"
-                ]["water-temp-too-high"]
-                == 1,
-            },
+    async def authenticate(self) -> bool:
+        """Auth with Firebase server"""
+        # Code loving yoinked from https://github.com/ammarzuberi/pyanova-api/blob/master/anova/AnovaCooker.py
+        firebase_req_data = {
+            "email": self.username,
+            "password": self.password,
+            "returnSecureToken": True,
         }
 
-    @staticmethod
-    def discover() -> None:
-        pass
+        firebase_req = await self.session.post(
+            f"https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={ANOVA_FIREBASE_KEY}",
+            json=firebase_req_data,
+        )
+        firebase_id_token_json = await firebase_req.json()
+        self._firebase_jwt = firebase_id_token_json.get("idToken")
+
+        if not self._firebase_jwt:
+            raise InvalidLogin("Could not log in with Google Firebase")
+
+        # Now authenticate with Anova using the Firebase ID token to get the JWT
+        anova_auth_req = await self.session.post(
+            "https://anovaculinary.io/authenticate",
+            json={},
+            headers={"firebase-token": self._firebase_jwt},
+        )
+        jwt_json = await anova_auth_req.json()
+        jwt = jwt_json.get("jwt")  # Looks like this JWT is valid for an entire year...
+
+        if not jwt:
+            raise InvalidLogin("Could not authenticate with Anova")
+
+        # Set JWT local variable
+        self._jwt = jwt
+
+        return True
+
+    async def get_devices(self) -> typing.List[AnovaPrecisionCooker]:
+        """Get all devices by connecting to anova websocket"""
+        if self._firebase_jwt is None or self._jwt is None:
+            raise AnovaException("Cannot get devices without first authenticating")
+        url = f"https://devices.anovaculinary.io/?token={self._firebase_jwt}"
+        user_devices = []
+        async with aiohttp.ClientSession() as session:
+            async with session.ws_connect(url) as ws:
+                async for msg in ws:
+                    # Filter messages based on the "command" field
+                    data = json.loads(msg.data)
+                    if data.get("command") == "EVENT_APC_WIFI_VERSION":
+                        payload = data.get("payload")
+                        devices: typing.List[Tuple[str, str]] = [
+                            (d["cookerId"], d["type"]) for d in payload
+                        ]
+                        for device in devices:
+                            user_devices.append(
+                                AnovaPrecisionCooker(
+                                    self.session, device[0], device[1], self._jwt
+                                )
+                            )
+                        return user_devices
+        return user_devices

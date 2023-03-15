@@ -4,7 +4,7 @@ import aiohttp
 import pytest
 
 from anova_wifi import AnovaOffline
-from anova_wifi.parser import (
+from anova_wifi.precission_cooker import (
     AnovaPrecisionCooker,
     AnovaPrecisionCookerBinarySensor,
     AnovaPrecisionCookerSensor,
@@ -63,16 +63,16 @@ dataset_one = [
 @pytest.mark.asyncio
 async def test_can_create():
     async with aiohttp.ClientSession() as session:
-        AnovaPrecisionCooker(session)
+        AnovaPrecisionCooker(session, "", "", "")
 
 
 @pytest.mark.asyncio
 @mock.patch("anova_wifi.parser.aiohttp.ClientResponse.json")
 async def test_async_data_1(json_mocked):
     async with aiohttp.ClientSession() as session:
-        apc = AnovaPrecisionCooker(session)
+        apc = AnovaPrecisionCooker(session, "", "", "")
         json_mocked.return_value = dataset_one
-        result = await apc.update("")
+        result = await apc.update()
         assert result == {
             "sensors": {
                 AnovaPrecisionCookerSensor.COOK_TIME: 0,
@@ -98,6 +98,6 @@ async def test_async_data_1(json_mocked):
 @pytest.mark.asyncio
 async def test_async_no_return():
     async with aiohttp.ClientSession() as session:
-        apc = AnovaPrecisionCooker(session)
+        apc = AnovaPrecisionCooker(session, "", "", "")
         with pytest.raises(AnovaOffline):
-            await apc.update("f")
+            await apc.update()
