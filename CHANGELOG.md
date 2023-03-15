@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.0 (2023-03-15)
+### Feature
+* Add authentication ([`d0e4976`](https://github.com/Lash-L/anova_wifi/commit/d0e49760707460319054d082104bfcae648d80a1))
+
+### Fix
+* Py 3.9 ([`9145fc5`](https://github.com/Lash-L/anova_wifi/commit/9145fc5e6a794238032a8b1359af863bb863cf72))
+
 ## v0.3.1 (2023-02-22)
 ### Fix
 * Session tests ([`e0d0f7c`](https://github.com/Lash-L/anova_wifi/commit/e0d0f7cf1f8c848b8579d741be3570741bd065c2))
