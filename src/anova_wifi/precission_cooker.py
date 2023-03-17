@@ -22,6 +22,8 @@ class AnovaPrecisionCookerSensor(StrEnum):
 
 class AnovaPrecisionCookerBinarySensor(StrEnum):
     COOKING = "cooking"
+    PREHEATING = "preheating"
+    MAINTAINING = "maintaining"
     DEVICE_SAFE = "device_safe"
     WATER_LEAK = "water_leak"
     WATER_LEVEL_CRITICAL = "water_level_critical"
@@ -105,8 +107,18 @@ class AnovaPrecisionCooker:
                 ]["water-temperature"],
             },
             "binary_sensors": {
-                AnovaPrecisionCookerBinarySensor.COOKING: anova_status["job"]["mode"]
-                == "COOK",
+                AnovaPrecisionCookerBinarySensor.COOKING: anova_status["job-status"][
+                    "state"
+                ]
+                == "COOKING",
+                AnovaPrecisionCookerBinarySensor.PREHEATING: anova_status["job-status"][
+                    "state"
+                ]
+                == "PREHEATING",
+                AnovaPrecisionCookerBinarySensor.MAINTAINING: anova_status[
+                    "job-status"
+                ]["state"]
+                == "MAINTAINING",
                 AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: anova_status["pin-info"][
                     "device-safe"
                 ]

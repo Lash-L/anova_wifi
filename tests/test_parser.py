@@ -87,6 +87,8 @@ async def test_async_data_1(json_mocked):
             },
             "binary_sensors": {
                 AnovaPrecisionCookerBinarySensor.COOKING: False,
+                AnovaPrecisionCookerBinarySensor.PREHEATING: False,
+                AnovaPrecisionCookerBinarySensor.MAINTAINING: False,
                 AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: False,
                 AnovaPrecisionCookerBinarySensor.WATER_LEAK: False,
                 AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: False,
