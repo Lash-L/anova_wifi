@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2023-03-17)
+### Feature
+* Added new binary sensors ([`d5d6bf1`](https://github.com/Lash-L/anova_wifi/commit/d5d6bf109c7fb9705a71250ae10270264c3e783c))
+
 ## v0.4.3 (2023-03-15)
 ### Fix
 * Bump poetry lock ([`74c570d`](https://github.com/Lash-L/anova_wifi/commit/74c570dc4f555f2bf2dec6dcd6292412da26c8f5))
