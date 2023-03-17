@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.2 (2023-03-17)
+### Fix
+* Bump sensor-state-data ([`f79c3a1`](https://github.com/Lash-L/anova_wifi/commit/f79c3a1ea92af90f4f28a2f9ab45b43ce882d9f8))
+
 ## v0.5.1 (2023-03-17)
 ### Fix
 * Improved request to sous vide ([`39c5c4a`](https://github.com/Lash-L/anova_wifi/commit/39c5c4a51fda947d5b390ccb6f62459367eb4039))
