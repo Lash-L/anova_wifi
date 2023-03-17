@@ -172,6 +172,12 @@ class AnovaPrecisionCooker:
         )
         if not resp.ok:
             raise Exception(f"{await resp.text()}")
+        else:
+            sous_vide_state = await resp.json()
+            self.cook_time = sous_vide_state["cook-time-seconds"]
+            self.mode = sous_vide_state["mode"]
+            self.target_temperature = sous_vide_state["target-temperature"]
+            self.temperature_unit = sous_vide_state["temperature-unit"]
 
     async def set_cook_time(self, seconds: int) -> None:
         """Sets how long you want the cook to be"""
@@ -183,7 +189,8 @@ class AnovaPrecisionCooker:
 
     async def set_target_temperature(self, temperature: float) -> None:
         """Sets the temperature of the cook"""
-        await self.build_request(target_temperature=temperature)
+        temp = round(temperature, 2)
+        await self.build_request(target_temperature=temp)
 
     async def set_temperature_unit(self, temperature_unit: str) -> None:
         """Sets the temperature unit for the anova"""
