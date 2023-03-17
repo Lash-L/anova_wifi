@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.1 (2023-03-17)
+### Fix
+* Improved request to sous vide ([`39c5c4a`](https://github.com/Lash-L/anova_wifi/commit/39c5c4a51fda947d5b390ccb6f62459367eb4039))
+
 ## v0.5.0 (2023-03-17)
 ### Feature
 * Added new binary sensors ([`d5d6bf1`](https://github.com/Lash-L/anova_wifi/commit/d5d6bf109c7fb9705a71250ae10270264c3e783c))
