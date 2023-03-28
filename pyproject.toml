@@ -6,9 +6,8 @@ authors = ["Luke <conway220@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/conway220/anova-wifi"
-documentation = "https://anova-wifi.readthedocs.io"
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",
