@@ -1,3 +1,4 @@
+import logging
 import secrets
 import string
 from typing import Any
@@ -6,6 +7,8 @@ import aiohttp
 from sensor_state_data.enum import StrEnum
 
 from anova_wifi.exceptions import AnovaException, AnovaOffline
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class AnovaPrecisionCookerSensor(StrEnum):
@@ -63,6 +66,7 @@ class AnovaPrecisionCooker:
             )
             anova_status_json = await http_response.json()
             anova_status = anova_status_json[0].get("body")
+            _LOGGER.debug("Got status: %s", anova_status)
         except (IndexError, aiohttp.ClientConnectorError):
             raise AnovaOffline(
                 "Cannot connect to sous vide - perhaps it is not online?"
@@ -165,6 +169,12 @@ class AnovaPrecisionCooker:
             else self.temperature_unit,
         }
         anova_req_headers = {"authorization": "Bearer " + self._jwt}
+        _LOGGER.debug(
+            "Sending https://anovaculinary.io/devices/%s/current-job with json %s and headers %s",
+            self.device_key,
+            json_req,
+            anova_req_headers,
+        )
         resp = await self.session.put(
             f"https://anovaculinary.io/devices/{self.device_key}/current-job",
             json=json_req,
@@ -174,6 +184,7 @@ class AnovaPrecisionCooker:
             raise Exception(f"{await resp.text()}")
         else:
             sous_vide_state = await resp.json()
+            _LOGGER.debug("Got response %s", sous_vide_state)
             self.cook_time = sous_vide_state["cook-time-seconds"]
             self.mode = sous_vide_state["mode"]
             self.target_temperature = sous_vide_state["target-temperature"]

@@ -73,6 +73,7 @@ class AnovaApi:
         user_devices = []
         timeout = time.time() + 5  # 5 seconds from now
         async with self.session.ws_connect(url) as ws:
+            _LOGGER.debug("looking for devices for 5 seconds...")
             while time.time() < timeout:
                 try:
                     msg = await ws.receive(4.5)
@@ -81,11 +82,13 @@ class AnovaApi:
                 # Filter messages based on the "command" field
                 data = json.loads(msg.data)
                 if data.get("command") == "EVENT_APC_WIFI_VERSION":
+                    _LOGGER.debug("Found Event APC WIFI")
                     payload = data.get("payload")
                     devices: typing.List[Tuple[str, str]] = [
                         (d["cookerId"], d["type"]) for d in payload
                     ]
                     for device in devices:
+                        _LOGGER.debug("Found device %s", device[0])
                         user_devices.append(
                             AnovaPrecisionCooker(
                                 self.session, device[0], device[1], self.jwt
