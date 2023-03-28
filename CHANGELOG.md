@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.0 (2023-03-28)
+### Feature
+* Add logging and dependabot ([`e994723`](https://github.com/Lash-L/anova_wifi/commit/e994723ace5bfcd45b4559034a732ae42d073e32))
+* Added logging and dependabot ([`a75c853`](https://github.com/Lash-L/anova_wifi/commit/a75c853278dabadfb4843f9bdddff010ed2f7731))
+
 ## v0.5.2 (2023-03-17)
 ### Fix
 * Bump sensor-state-data ([`f79c3a1`](https://github.com/Lash-L/anova_wifi/commit/f79c3a1ea92af90f4f28a2f9ab45b43ce882d9f8))
