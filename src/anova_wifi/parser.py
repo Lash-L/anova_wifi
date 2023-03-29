@@ -69,7 +69,7 @@ class AnovaApi:
         """Get all devices by connecting to anova websocket"""
         if self._firebase_jwt is None or self.jwt is None:
             raise AnovaException("Cannot get devices without first authenticating")
-        url = f"https://devices.anovaculinary.io/?token={self._firebase_jwt}"
+        url = f"https://devices.anovaculinary.io/?token={self._firebase_jwt}&supportedAccessories=APC&platform=android"
         user_devices = []
         timeout = time.time() + 5  # 5 seconds from now
         async with self.session.ws_connect(url) as ws:
