@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.1 (2023-03-29)
+### Fix
+* Add limitation to ws url ([`9f2ce32`](https://github.com/Lash-L/anova_wifi/commit/9f2ce326bb3869755f96acbe8949dadff0ff2d63))
+
 ## v0.6.0 (2023-03-28)
 ### Feature
 * Add logging and dependabot ([`e994723`](https://github.com/Lash-L/anova_wifi/commit/e994723ace5bfcd45b4559034a732ae42d073e32))
