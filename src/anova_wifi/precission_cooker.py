@@ -138,7 +138,9 @@ class AnovaPrecisionCooker:
                 AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: anova_status[
                     "pin-info"
                 ]["water-temp-too-high"]
-                == 1,
+                == 1
+                if "water-temp-too-high" in anova_status["pin-info"]
+                else None,
             },
         }
 
