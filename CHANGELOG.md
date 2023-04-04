@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.2 (2023-04-04)
+### Fix
+* Set water temp as None if it does not exist ([`2750a9d`](https://github.com/Lash-L/anova_wifi/commit/2750a9d83b8af30365a92e1af01040b532ae1ecf))
+
 ## v0.6.1 (2023-03-29)
 ### Fix
 * Add limitation to ws url ([`9f2ce32`](https://github.com/Lash-L/anova_wifi/commit/9f2ce326bb3869755f96acbe8949dadff0ff2d63))
