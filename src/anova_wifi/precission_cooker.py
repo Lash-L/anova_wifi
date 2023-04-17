@@ -1,7 +1,7 @@
 import logging
 import secrets
 import string
-from typing import Any
+from typing import TypedDict
 
 import aiohttp
 from sensor_state_data.enum import StrEnum
@@ -32,6 +32,31 @@ class AnovaPrecisionCookerBinarySensor(StrEnum):
     WATER_LEVEL_CRITICAL = "water_level_critical"
     WATER_TEMP_TOO_HIGH = "water_temp_too_high"
 
+class AnovaSensorUpdate(TypedDict):
+    cook_time: int
+    mode: str
+    state: str
+    target_temperature: float
+    cook_time_remaining: int
+    firmware_version: str
+    heater_temperature: float
+    triac_temperature: float
+    water_temperature: float
+
+class AnovaBinarySensorUpdate(TypedDict):
+    cooking: bool
+    preheating: bool
+    maintaining: bool
+    device_safe: bool
+    water_leak: bool
+    water_level_critical: bool
+    water_temp_too_high: bool
+
+
+class AnovaUpdate(TypedDict):
+    sensors: AnovaSensorUpdate
+    binary_sensors: AnovaBinarySensorUpdate
+
 
 MODE_MAP = {"IDLE": "Idle", "COOK": "Cook", "LOW WATER": "Low water"}
 
@@ -58,7 +83,7 @@ class AnovaPrecisionCooker:
 
     async def update(
         self,
-    ) -> dict[str, dict[str, Any]]:
+    ) -> AnovaUpdate:
         """Updates the Sous vide's data with a non-authenticated api call"""
         try:
             http_response = await self.session.get(
@@ -80,7 +105,7 @@ class AnovaPrecisionCooker:
         self.cook_time = anova_status["job"]["cook-time-seconds"]
         self.target_temperature = anova_status["job"]["target-temperature"]
         self.temperature_unit = anova_status["job"]["temperature-unit"]
-        return {
+        update: AnovaUpdate = {
             "sensors": {
                 AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"][
                     "cook-time-seconds"
@@ -138,11 +163,10 @@ class AnovaPrecisionCooker:
                 AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: anova_status[
                     "pin-info"
                 ]["water-temp-too-high"]
-                == 1
-                if "water-temp-too-high" in anova_status["pin-info"]
-                else None,
+                == 1,
             },
         }
+        return update
 
     async def build_request(
         self,
