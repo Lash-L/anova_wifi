@@ -20,14 +20,21 @@ class AnovaApi:
     """A class to handle communicating with the anova api to get devices"""
 
     def __init__(
-        self, session: aiohttp.ClientSession, username: str, password: str
+        self,
+        session: aiohttp.ClientSession,
+        username: str,
+        password: str,
+        existing_devices: list[AnovaPrecisionCooker] | None = None,
     ) -> None:
         """Creates an anova api class"""
+        if existing_devices is None:
+            existing_devices = []
         self.session = session
         self.username = username
         self.password = password
         self.jwt: str | None = None
         self._firebase_jwt: str | None = None
+        self.existing_devices = existing_devices
 
     async def authenticate(self) -> bool:
         """Auth with Firebase server"""
@@ -72,6 +79,8 @@ class AnovaApi:
         url = f"https://devices.anovaculinary.io/?token={self._firebase_jwt}&supportedAccessories=APC&platform=android"
         user_devices = []
         timeout = time.time() + 5  # 5 seconds from now
+
+        existing_devices_keys = [d.device_key for d in self.existing_devices]
         async with self.session.ws_connect(url) as ws:
             _LOGGER.debug("looking for devices for 5 seconds...")
             while time.time() < timeout:
@@ -85,7 +94,9 @@ class AnovaApi:
                     _LOGGER.debug("Found Event APC WIFI")
                     payload = data.get("payload")
                     devices: typing.List[Tuple[str, str]] = [
-                        (d["cookerId"], d["type"]) for d in payload
+                        (d["cookerId"], d["type"])
+                        for d in payload
+                        if d["cookerId"] not in existing_devices_keys
                     ]
                     for device in devices:
                         _LOGGER.debug("Found device %s", device[0])
@@ -96,4 +107,5 @@ class AnovaApi:
                         )
         if len(user_devices) == 0:
             raise NoDevicesFound("Found no devices on the websocket")
+        self.existing_devices = self.existing_devices + user_devices
         return user_devices
