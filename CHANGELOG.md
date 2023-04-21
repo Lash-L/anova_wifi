@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.0 (2023-04-21)
+### Feature
+* Ignore already existing devices ([`c7c7861`](https://github.com/Lash-L/anova_wifi/commit/c7c7861d8d05f85274451c84b0c386e5885b6446))
+
 ## v0.7.0 (2023-04-21)
 ### Feature
 * Add typeddict for anova updated ([`7f2da00`](https://github.com/Lash-L/anova_wifi/commit/7f2da00d84750bc9168b13184936a609db15cdd6))
