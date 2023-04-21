@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.0 (2023-04-21)
+### Feature
+* Add typeddict for anova updated ([`7f2da00`](https://github.com/Lash-L/anova_wifi/commit/7f2da00d84750bc9168b13184936a609db15cdd6))
+
 ## v0.6.2 (2023-04-04)
 ### Fix
 * Set water temp as None if it does not exist ([`2750a9d`](https://github.com/Lash-L/anova_wifi/commit/2750a9d83b8af30365a92e1af01040b532ae1ecf))
