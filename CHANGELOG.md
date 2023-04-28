@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.9.0 (2023-04-28)
+### Feature
+* Changed to dataclass for updates ([`4394c5d`](https://github.com/Lash-L/anova_wifi/commit/4394c5df40796053c8e0f60b6c408e42aa039ba7))
+
+### Fix
+* Linting ([`8657c1d`](https://github.com/Lash-L/anova_wifi/commit/8657c1d4b7e338f5f82ec5acef62bb52f07f779f))
+
 ## v0.8.0 (2023-04-21)
 ### Feature
 * Ignore already existing devices ([`c7c7861`](https://github.com/Lash-L/anova_wifi/commit/c7c7861d8d05f85274451c84b0c386e5885b6446))
