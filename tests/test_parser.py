@@ -4,11 +4,7 @@ import aiohttp
 import pytest
 
 from anova_wifi import AnovaOffline
-from anova_wifi.precission_cooker import (
-    AnovaPrecisionCooker,
-    AnovaPrecisionCookerBinarySensor,
-    AnovaPrecisionCookerSensor,
-)
+from anova_wifi.precission_cooker import AnovaPrecisionCooker
 
 dataset_one = [
     {
@@ -73,28 +69,24 @@ async def test_async_data_1(json_mocked):
         apc = AnovaPrecisionCooker(session, "", "", "")
         json_mocked.return_value = dataset_one
         result = await apc.update()
-        assert result == {
-            "sensors": {
-                AnovaPrecisionCookerSensor.COOK_TIME: 0,
-                AnovaPrecisionCookerSensor.MODE: "Idle",
-                AnovaPrecisionCookerSensor.STATE: "No state",
-                AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: 54.72,
-                AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: 0,
-                AnovaPrecisionCookerSensor.FIRMWARE_VERSION: "2.2.0",
-                AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: 22.37,
-                AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: 36.04,
-                AnovaPrecisionCookerSensor.WATER_TEMPERATURE: 18.33,
-            },
-            "binary_sensors": {
-                AnovaPrecisionCookerBinarySensor.COOKING: False,
-                AnovaPrecisionCookerBinarySensor.PREHEATING: False,
-                AnovaPrecisionCookerBinarySensor.MAINTAINING: False,
-                AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: False,
-                AnovaPrecisionCookerBinarySensor.WATER_LEAK: False,
-                AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: False,
-                AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: False,
-            },
-        }
+        sensors = result.sensor
+        assert sensors.cook_time == 0
+        assert sensors.mode == "Idle"
+        assert sensors.state == "No state"
+        assert sensors.target_temperature == 54.72
+        assert sensors.cook_time_remaining == 0
+        assert sensors.firmware_version == "2.2.0"
+        assert sensors.heater_temperature == 22.37
+        assert sensors.triac_temperature == 36.04
+        assert sensors.water_temperature == 18.33
+        binary_sensors = result.binary_sensor
+        assert not binary_sensors.cooking
+        assert not binary_sensors.preheating
+        assert not binary_sensors.maintaining
+        assert not binary_sensors.device_safe
+        assert not binary_sensors.water_leak
+        assert not binary_sensors.water_level_critical
+        assert not binary_sensors.water_temp_too_high
 
 
 @pytest.mark.asyncio
