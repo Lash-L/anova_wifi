@@ -2,19 +2,21 @@ from .exceptions import AnovaException, AnovaOffline, InvalidLogin, NoDevicesFou
 from .parser import AnovaApi
 from .precission_cooker import (
     AnovaPrecisionCooker,
-    AnovaPrecisionCookerBinarySensor,
-    AnovaPrecisionCookerSensor,
+    APCUpdate,
+    APCUpdateSensor,
+    APCUpdateBinary
 )
 
 __version__ = "0.8.0"
 
 __all__ = [
     "AnovaApi",
-    "AnovaPrecisionCookerBinarySensor",
-    "AnovaPrecisionCookerSensor",
     "AnovaOffline",
     "AnovaException",
     "InvalidLogin",
     "AnovaPrecisionCooker",
     "NoDevicesFound",
+    "APCUpdate",
+    "APCUpdateSensor",
+    "APCUpdateBinary"
 ]

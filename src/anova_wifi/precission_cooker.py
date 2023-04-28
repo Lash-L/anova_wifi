@@ -1,36 +1,13 @@
 import logging
 import secrets
 import string
-from typing import Any
-
+from dataclasses import dataclass
 import aiohttp
 from sensor_state_data.enum import StrEnum
 
 from anova_wifi.exceptions import AnovaException, AnovaOffline
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class AnovaPrecisionCookerSensor(StrEnum):
-    COOK_TIME = "cook_time"
-    MODE = "mode"
-    STATE = "state"
-    TARGET_TEMPERATURE = "target_temperature"
-    COOK_TIME_REMAINING = "cook_time_remaining"
-    FIRMWARE_VERSION = "firmware_version"
-    HEATER_TEMPERATURE = "heater_temperature"
-    TRIAC_TEMPERATURE = "triac_temperature"
-    WATER_TEMPERATURE = "water_temperature"
-
-
-class AnovaPrecisionCookerBinarySensor(StrEnum):
-    COOKING = "cooking"
-    PREHEATING = "preheating"
-    MAINTAINING = "maintaining"
-    DEVICE_SAFE = "device_safe"
-    WATER_LEAK = "water_leak"
-    WATER_LEVEL_CRITICAL = "water_level_critical"
-    WATER_TEMP_TOO_HIGH = "water_temp_too_high"
 
 
 MODE_MAP = {"IDLE": "Idle", "COOK": "Cook", "LOW WATER": "Low water"}
@@ -42,6 +19,32 @@ STATE_MAP = {
     "": "No state",
 }
 
+@dataclass
+class APCUpdateBinary:
+    cooking: bool
+    preheating: bool
+    maintaining: bool
+    device_safe: bool
+    water_leak: bool
+    water_level_critical: bool
+    water_temp_too_high: bool
+
+@dataclass
+class APCUpdateSensor:
+    cook_time: int
+    mode: str
+    state: str
+    target_temperature: float
+    cook_time_remaining: int
+    firmware_version: str
+    heater_temperature: float
+    triac_temperature: float
+    water_temperature: float
+
+@dataclass
+class APCUpdate:
+    binary_sensor: APCUpdateBinary
+    sensor: APCUpdateSensor
 
 class AnovaPrecisionCooker:
     def __init__(
@@ -51,14 +54,11 @@ class AnovaPrecisionCooker:
         self.device_key = device_key
         self.type = type
         self._jwt = jwt
-        self.cook_time: float | None = None
-        self.mode: str | None = None
-        self.target_temperature: float | None = None
-        self.temperature_unit: float | None = None
+        self.status: APCUpdate | None = None
 
     async def update(
         self,
-    ) -> dict[str, dict[str, Any]]:
+    ) -> APCUpdate:
         """Updates the Sous vide's data with a non-authenticated api call"""
         try:
             http_response = await self.session.get(
@@ -76,73 +76,32 @@ class AnovaPrecisionCooker:
             if "system-info" in key and "details" not in key and "nxp" not in key:
                 system_info = key
                 break
-        self.mode = anova_status["job"]["mode"]
-        self.cook_time = anova_status["job"]["cook-time-seconds"]
-        self.target_temperature = anova_status["job"]["target-temperature"]
-        self.temperature_unit = anova_status["job"]["temperature-unit"]
-        return {
-            "sensors": {
-                AnovaPrecisionCookerSensor.COOK_TIME: anova_status["job"][
-                    "cook-time-seconds"
-                ],
-                AnovaPrecisionCookerSensor.MODE: MODE_MAP.get(
-                    anova_status["job"]["mode"]
-                ),
-                AnovaPrecisionCookerSensor.STATE: STATE_MAP.get(
-                    anova_status["job-status"]["state"],
-                ),
-                AnovaPrecisionCookerSensor.TARGET_TEMPERATURE: anova_status["job"][
-                    "target-temperature"
-                ],
-                AnovaPrecisionCookerSensor.COOK_TIME_REMAINING: anova_status[
-                    "job-status"
-                ]["cook-time-remaining"],
-                AnovaPrecisionCookerSensor.FIRMWARE_VERSION: anova_status[system_info][
-                    "firmware-version"
-                ],
-                AnovaPrecisionCookerSensor.HEATER_TEMPERATURE: anova_status[
-                    "temperature-info"
-                ]["heater-temperature"],
-                AnovaPrecisionCookerSensor.TRIAC_TEMPERATURE: anova_status[
-                    "temperature-info"
-                ]["triac-temperature"],
-                AnovaPrecisionCookerSensor.WATER_TEMPERATURE: anova_status[
-                    "temperature-info"
-                ]["water-temperature"],
-            },
-            "binary_sensors": {
-                AnovaPrecisionCookerBinarySensor.COOKING: anova_status["job-status"][
-                    "state"
-                ]
-                == "COOKING",
-                AnovaPrecisionCookerBinarySensor.PREHEATING: anova_status["job-status"][
-                    "state"
-                ]
-                == "PREHEATING",
-                AnovaPrecisionCookerBinarySensor.MAINTAINING: anova_status[
-                    "job-status"
-                ]["state"]
-                == "MAINTAINING",
-                AnovaPrecisionCookerBinarySensor.DEVICE_SAFE: anova_status["pin-info"][
-                    "device-safe"
-                ]
-                == 1,
-                AnovaPrecisionCookerBinarySensor.WATER_LEAK: anova_status["pin-info"][
-                    "water-leak"
-                ]
-                == 1,
-                AnovaPrecisionCookerBinarySensor.WATER_LEVEL_CRITICAL: anova_status[
-                    "pin-info"
-                ]["water-level-critical"]
-                == 1,
-                AnovaPrecisionCookerBinarySensor.WATER_TEMP_TOO_HIGH: anova_status[
-                    "pin-info"
-                ]["water-temp-too-high"]
-                == 1
-                if "water-temp-too-high" in anova_status["pin-info"]
+        binary_sensor = APCUpdateBinary(
+            cooking=anova_status["job-status"]["state"]== "COOKING",
+            preheating=anova_status["job-status"]["state"]== "PREHEATING",
+            maintaining=anova_status["job-status"]["state"]== "MAINTAINING",
+            device_safe=anova_status["pin-info"]["device-safe"] == 1,
+            water_leak=anova_status["pin-info"]["water-leak"] ==1,
+            water_level_critical=anova_status["pin-info"]["water-level-critical"]==1,
+            water_temp_too_high=anova_status["pin-info"]["water-temp-too-high"]==1 if "water-temp-too-high" in anova_status["pin-info"]
                 else None,
-            },
-        }
+                        )
+        sensor = APCUpdateSensor(
+            cook_time=anova_status["job"]["cook-time-seconds"],
+            mode=MODE_MAP.get(anova_status["job"]["mode"]),
+            state=STATE_MAP.get(anova_status["job-status"]["state"]),
+            target_temperature=anova_status["job"]["target-temperature"],
+            cook_time_remaining=anova_status["job-status"]["cook-time-remaining"],
+            firmware_version=anova_status[system_info]["firmware-version"],
+            heater_temperature=anova_status["temperature-info"]["heater-temperature"],
+            triac_temperature=anova_status["temperature-info"]["triac-temperature"],
+            water_temperature=anova_status["temperature-info"]["water-temperature"],
+        )
+        self.status = APCUpdate(
+            binary_sensor=binary_sensor,
+            sensor=sensor,
+        )
+        return self.status
 
     async def build_request(
         self,
@@ -154,21 +113,23 @@ class AnovaPrecisionCooker:
         """Builds an api call for the sous vide"""
         if self._jwt is None:
             raise AnovaException("No JWT - ")
+        if self.status is None:
+            raise AnovaException("No status - cannot build request")
         json_req = {
-            "cook-time-seconds": cook_time if cook_time is not None else self.cook_time,
+            "cook-time-seconds": cook_time if cook_time is not None else self.status.sensor.cook_time,
             "id": "".join(
                 secrets.choice(string.ascii_lowercase + string.digits)
                 for _ in range(22)
             ),
             # 22 digit random job ID for a new job at every save
-            "mode": mode if mode is not None else self.mode,
+            "mode": mode if mode is not None else self.status.sensor.mode,
             "ota-url": "",
             "target-temperature": target_temperature
             if target_temperature is not None
-            else self.target_temperature,
+            else self.status.sensor.target_temperature,
             "temperature-unit": temperature_unit
             if temperature_unit is not None
-            else self.temperature_unit,
+            else self.status.sensor.temperature_unit,
         }
         anova_req_headers = {"authorization": "Bearer " + self._jwt}
         _LOGGER.debug(
@@ -187,10 +148,10 @@ class AnovaPrecisionCooker:
         else:
             sous_vide_state = await resp.json()
             _LOGGER.debug("Got response %s", sous_vide_state)
-            self.cook_time = sous_vide_state["cook-time-seconds"]
-            self.mode = sous_vide_state["mode"]
-            self.target_temperature = sous_vide_state["target-temperature"]
-            self.temperature_unit = sous_vide_state["temperature-unit"]
+            self.status.sensor.cook_time = sous_vide_state["cook-time-seconds"]
+            self.status.sensor.mode = sous_vide_state["mode"]
+            self.status.sensor.target_temperature = sous_vide_state["target-temperature"]
+            self.status.sensor.temperature_unit = sous_vide_state["temperature-unit"]
 
     async def set_cook_time(self, seconds: int) -> None:
         """Sets how long you want the cook to be"""
