@@ -90,6 +90,7 @@ class AnovaApi:
                     raise NoDevicesFound("Found no devices on websocket")
                 # Filter messages based on the "command" field
                 data = json.loads(msg.data)
+                _LOGGER.debug("Found message %s", data)
                 if data.get("command") == "EVENT_APC_WIFI_VERSION":
                     _LOGGER.debug("Found Event APC WIFI")
                     payload = data.get("payload")
