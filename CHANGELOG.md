@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.0 (2023-05-05)
+### Feature
+* Add debug to ws ([`dcdeb97`](https://github.com/Lash-L/anova_wifi/commit/dcdeb97d3034b3cff18268b15227380717e54f0d))
+
 ## v0.9.0 (2023-04-28)
 ### Feature
 * Changed to dataclass for updates ([`4394c5d`](https://github.com/Lash-L/anova_wifi/commit/4394c5df40796053c8e0f60b6c408e42aa039ba7))
