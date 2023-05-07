@@ -1,6 +1,7 @@
 import logging
 import secrets
 import string
+import time
 from dataclasses import dataclass
 
 import aiohttp
@@ -60,11 +61,14 @@ class AnovaPrecisionCooker:
         self._jwt = jwt
         self.status: APCUpdate | None = None
         self.temperature_unit: str = "C"
+        self.last_update: float = 0
 
     async def update(
         self,
     ) -> APCUpdate:
         """Updates the Sous vide's data with a non-authenticated api call"""
+        if time.monotonic() - self.last_update < 15:
+            return self.status
         try:
             http_response = await self.session.get(
                 f"https://anovaculinary.io/devices/{self.device_key}/states/?limit=1"
@@ -152,7 +156,7 @@ class AnovaPrecisionCooker:
             headers=anova_req_headers,
         )
         if not resp.ok:
-            raise Exception(f"{await resp.text()}")
+            raise AnovaException(f"{await resp.text()}")
         else:
             sous_vide_state = await resp.json()
             _LOGGER.debug("Got response %s", sous_vide_state)
@@ -162,6 +166,7 @@ class AnovaPrecisionCooker:
                 "target-temperature"
             ]
             self.temperature_unit = sous_vide_state["temperature-unit"]
+            self.last_update = time.monotonic()
 
     async def set_cook_time(self, seconds: int) -> None:
         """Sets how long you want the cook to be"""
