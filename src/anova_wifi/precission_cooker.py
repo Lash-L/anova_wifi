@@ -67,7 +67,7 @@ class AnovaPrecisionCooker:
         self,
     ) -> APCUpdate:
         """Updates the Sous vide's data with a non-authenticated api call"""
-        if time.monotonic() - self.last_update < 15:
+        if time.monotonic() - self.last_update < 15 and self.status is not None:
             return self.status
         try:
             http_response = await self.session.get(
