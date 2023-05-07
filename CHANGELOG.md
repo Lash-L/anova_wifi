@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.1 (2023-05-07)
+### Fix
+* Mypy error ([`c99cab0`](https://github.com/Lash-L/anova_wifi/commit/c99cab03975eb0e38ae92babf8681475a06c6809))
+* Only update if 15 seconds have passed ([`303e791`](https://github.com/Lash-L/anova_wifi/commit/303e791f9dd888b8b5b36788cbb77b20d7a8097d))
+
 ## v0.10.0 (2023-05-05)
 ### Feature
 * Add debug to ws ([`dcdeb97`](https://github.com/Lash-L/anova_wifi/commit/dcdeb97d3034b3cff18268b15227380717e54f0d))
