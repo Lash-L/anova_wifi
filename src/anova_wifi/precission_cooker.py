@@ -84,6 +84,7 @@ class AnovaPrecisionCooker:
             if "system-info" in key and "details" not in key and "nxp" not in key:
                 system_info = key
                 break
+        self.temperature_unit = anova_status["job"]["temperature-unit"]
         binary_sensor = APCUpdateBinary(
             cooking=anova_status["job-status"]["state"] == "COOKING",
             preheating=anova_status["job-status"]["state"] == "PREHEATING",
