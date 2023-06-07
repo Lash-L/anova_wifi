@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.2 (2023-06-07)
+### Fix
+* Correctly update mode ([`5ad6c99`](https://github.com/Lash-L/anova_wifi/commit/5ad6c99170d84706e8fd572600611ca9ffdb62ba))
+
 ## v0.10.1 (2023-05-07)
 ### Fix
 * Mypy error ([`c99cab0`](https://github.com/Lash-L/anova_wifi/commit/c99cab03975eb0e38ae92babf8681475a06c6809))
