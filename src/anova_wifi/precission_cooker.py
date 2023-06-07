@@ -10,7 +10,6 @@ from anova_wifi.exceptions import AnovaException, AnovaOffline
 
 _LOGGER = logging.getLogger(__name__)
 
-
 MODE_MAP = {"IDLE": "Idle", "COOK": "Cook", "LOW WATER": "Low water"}
 
 STATE_MAP = {
@@ -67,7 +66,7 @@ class AnovaPrecisionCooker:
         self,
     ) -> APCUpdate:
         """Updates the Sous vide's data with a non-authenticated api call"""
-        if time.monotonic() - self.last_update < 15 and self.status is not None:
+        if time.monotonic() - self.last_update < 10 and self.status is not None:
             return self.status
         try:
             http_response = await self.session.get(
@@ -161,7 +160,7 @@ class AnovaPrecisionCooker:
             sous_vide_state = await resp.json()
             _LOGGER.debug("Got response %s", sous_vide_state)
             self.status.sensor.cook_time = sous_vide_state["cook-time-seconds"]
-            self.status.sensor.mode = sous_vide_state["mode"]
+            self.status.sensor.mode = MODE_MAP.get(sous_vide_state["mode"], "Unknown")
             self.status.sensor.target_temperature = sous_vide_state[
                 "target-temperature"
             ]
