@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.3 (2023-06-07)
+### Fix
+* Set temperature unit ([`70325b0`](https://github.com/Lash-L/anova_wifi/commit/70325b0b67a751bd775e98fdcd23ae5b3a106ad8))
+
 ## v0.10.2 (2023-06-07)
 ### Fix
 * Correctly update mode ([`5ad6c99`](https://github.com/Lash-L/anova_wifi/commit/5ad6c99170d84706e8fd572600611ca9ffdb62ba))
