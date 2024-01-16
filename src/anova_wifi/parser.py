@@ -1,14 +1,10 @@
 import asyncio
-import json
 import logging
-import time
-import typing
-from typing import Tuple
 
 import aiohttp
 
-from anova_wifi.exceptions import AnovaException, InvalidLogin, NoDevicesFound
-from anova_wifi.precission_cooker import AnovaPrecisionCooker
+from .exceptions import InvalidLogin, NoDevicesFound, WebsocketFailure
+from .websocket_handler import AnovaWebsocketHandler
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,17 +20,14 @@ class AnovaApi:
         session: aiohttp.ClientSession,
         username: str,
         password: str,
-        existing_devices: list[AnovaPrecisionCooker] | None = None,
     ) -> None:
         """Creates an anova api class"""
-        if existing_devices is None:
-            existing_devices = []
         self.session = session
         self.username = username
         self.password = password
         self.jwt: str | None = None
         self._firebase_jwt: str | None = None
-        self.existing_devices = existing_devices
+        self.websocket_handler: AnovaWebsocketHandler | None = None
 
     async def authenticate(self) -> bool:
         """Auth with Firebase server"""
@@ -72,41 +65,19 @@ class AnovaApi:
 
         return True
 
-    async def get_devices(self) -> typing.List[AnovaPrecisionCooker]:
-        """Get all devices by connecting to anova websocket"""
-        if self._firebase_jwt is None or self.jwt is None:
-            raise AnovaException("Cannot get devices without first authenticating")
-        url = f"https://devices.anovaculinary.io/?token={self._firebase_jwt}&supportedAccessories=APC&platform=android"
-        user_devices = []
-        timeout = time.time() + 5  # 5 seconds from now
+    async def create_websocket(self) -> None:
+        if self._firebase_jwt is None:
+            raise WebsocketFailure("Firebase jwt was none.")
+        if self.jwt is None:
+            raise WebsocketFailure("jwt was none.")
+        self.websocket_handler = AnovaWebsocketHandler(
+            firebase_jwt=self._firebase_jwt, jwt=self.jwt, session=self.session
+        )
+        await self.websocket_handler.connect()
+        await asyncio.sleep(5)
+        if not self.websocket_handler.devices:
+            raise NoDevicesFound("No devices were found on the websocket.")
 
-        existing_devices_keys = [d.device_key for d in self.existing_devices]
-        async with self.session.ws_connect(url) as ws:
-            _LOGGER.debug("looking for devices for 5 seconds...")
-            while time.time() < timeout:
-                try:
-                    msg = await ws.receive(4.5)
-                except asyncio.TimeoutError:
-                    raise NoDevicesFound("Found no devices on websocket")
-                # Filter messages based on the "command" field
-                data = json.loads(msg.data)
-                _LOGGER.debug("Found message %s", data)
-                if data.get("command") == "EVENT_APC_WIFI_VERSION":
-                    _LOGGER.debug("Found Event APC WIFI")
-                    payload = data.get("payload")
-                    devices: typing.List[Tuple[str, str]] = [
-                        (d["cookerId"], d["type"])
-                        for d in payload
-                        if d["cookerId"] not in existing_devices_keys
-                    ]
-                    for device in devices:
-                        _LOGGER.debug("Found device %s", device[0])
-                        user_devices.append(
-                            AnovaPrecisionCooker(
-                                self.session, device[0], device[1], self.jwt
-                            )
-                        )
-        if len(user_devices) == 0:
-            raise NoDevicesFound("Found no devices on the websocket")
-        self.existing_devices = self.existing_devices + user_devices
-        return user_devices
+    async def disconnect_websocket(self) -> None:
+        if self.websocket_handler is not None:
+            await self.websocket_handler.disconnect()
