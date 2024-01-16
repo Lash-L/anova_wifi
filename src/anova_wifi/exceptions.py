@@ -12,3 +12,7 @@ class InvalidLogin(AnovaException):
 
 class NoDevicesFound(AnovaException):
     pass
+
+
+class WebsocketFailure(AnovaException):
+    pass
