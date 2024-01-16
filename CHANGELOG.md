@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.4 (2024-01-16)
+
+### Fix
+
+* Refactor to use websocket ([`c1e7f45`](https://github.com/Lash-L/anova_wifi/commit/c1e7f45b2a8f8b6f266825317d63e58f34498831))
+
 ## v0.10.3 (2023-06-07)
 ### Fix
 * Set temperature unit ([`70325b0`](https://github.com/Lash-L/anova_wifi/commit/70325b0b67a751bd775e98fdcd23ae5b3a106ad8))
