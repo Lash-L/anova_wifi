@@ -16,3 +16,7 @@ class NoDevicesFound(AnovaException):
 
 class WebsocketFailure(AnovaException):
     pass
+
+
+class LoginUnreachable(AnovaException):
+    pass

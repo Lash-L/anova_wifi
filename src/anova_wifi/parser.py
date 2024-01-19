@@ -2,8 +2,9 @@ import asyncio
 import logging
 
 import aiohttp
+from aiohttp import ClientConnectorError
 
-from .exceptions import InvalidLogin, NoDevicesFound, WebsocketFailure
+from .exceptions import InvalidLogin, LoginUnreachable, NoDevicesFound, WebsocketFailure
 from .websocket_handler import AnovaWebsocketHandler
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,11 +38,15 @@ class AnovaApi:
             "password": self.password,
             "returnSecureToken": True,
         }
-
-        firebase_req = await self.session.post(
-            f"https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={ANOVA_FIREBASE_KEY}",
-            json=firebase_req_data,
-        )
+        try:
+            firebase_req = await self.session.post(
+                f"https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key={ANOVA_FIREBASE_KEY}",
+                json=firebase_req_data,
+            )
+        except ClientConnectorError as err:
+            raise LoginUnreachable(
+                "Failed to connect to Anova's firebase instance"
+            ) from err
         firebase_id_token_json = await firebase_req.json()
         self._firebase_jwt = firebase_id_token_json.get("idToken")
 
