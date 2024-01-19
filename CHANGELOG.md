@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.6 (2024-01-19)
+
+### Fix
+
+* Make state and mode on apc update strings ([`53ceb2e`](https://github.com/Lash-L/anova_wifi/commit/53ceb2ec2e4f50509057446d5b4729167f876bf8))
+
 ## v0.10.5 (2024-01-19)
 
 ### Fix
