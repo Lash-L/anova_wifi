@@ -163,8 +163,8 @@ class WifiCookerStateBody:
     def to_apc_update(self) -> APCUpdate:
         sensors = APCUpdateSensor(
             cook_time=self.job.cook_time_seconds,
-            mode=self.job.mode,
-            state=self.job_status.state,
+            mode=self.job.mode.value,
+            state=self.job_status.state.value,
             target_temperature=self.job.target_temperature,
             cook_time_remaining=self.job_status.cook_time_remaining,
             firmware_version=self.firmware_version,
