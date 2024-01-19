@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.5 (2024-01-19)
+
+### Fix
+
+* Add unreachable login error ([`bbd5a5b`](https://github.com/Lash-L/anova_wifi/commit/bbd5a5bbb83a3c0dd87cacd713baa482a687f443))
+
 ## v0.10.4 (2024-01-16)
 
 ### Fix
