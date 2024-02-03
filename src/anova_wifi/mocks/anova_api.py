@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 from aiohttp import ClientSession
 
-from anova_wifi import AnovaApi, AnovaWebsocketHandler
+from anova_wifi import AnovaWebsocketHandler
 
 DUMMY_ID = "anova_id"
 
@@ -60,7 +60,7 @@ class MockedAnovaWebsocketHandler(AnovaWebsocketHandler):
         asyncio.ensure_future(self.message_listener())
 
 
-async def anova_api() -> AnovaApi:
+async def anova_api() -> AsyncMock:
     """Mock the api for Anova."""
     api_mock = AsyncMock()
 
@@ -142,9 +142,4 @@ async def anova_api() -> AnovaApi:
 
     api_mock.authenticate.side_effect = authenticate_side_effect
     api_mock.create_websocket.side_effect = create_websocket_side_effect
-    api = AnovaApi(
-        None,
-        "sample@gmail.com",
-        "sample",
-    )
-    return api
+    return api_mock
