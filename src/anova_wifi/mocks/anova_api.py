@@ -60,7 +60,10 @@ class MockedAnovaWebsocketHandler(AnovaWebsocketHandler):
         asyncio.ensure_future(self.message_listener())
 
 
-def anova_api_mock() -> AsyncMock:
+def anova_api_mock(
+    connect_messages: list[MockedanovaWebsocketMessage] | None = None,
+    post_connect_messages: list[MockedanovaWebsocketMessage] | None = None,
+) -> AsyncMock:
     """Mock the api for Anova."""
     api_mock = AsyncMock()
 
@@ -73,7 +76,9 @@ def anova_api_mock() -> AsyncMock:
             firebase_jwt=api_mock._firebase_jwt,
             jwt=api_mock.jwt,
             session=AsyncMock(),
-            connect_messages=[
+            connect_messages=connect_messages
+            if connect_messages is not None
+            else [
                 MockedanovaWebsocketMessage(
                     {
                         "command": "EVENT_APC_WIFI_LIST",
@@ -88,7 +93,9 @@ def anova_api_mock() -> AsyncMock:
                     }
                 ),
             ],
-            post_connect_messages=[
+            post_connect_messages=post_connect_messages
+            if post_connect_messages is not None
+            else [
                 MockedanovaWebsocketMessage(
                     {
                         "command": "EVENT_APC_STATE",
