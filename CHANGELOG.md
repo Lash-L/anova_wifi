@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.2 (2024-02-03)
+
+### Fix
+
+* Make fn not async ([#31](https://github.com/Lash-L/anova_wifi/issues/31)) ([`863ce1f`](https://github.com/Lash-L/anova_wifi/commit/863ce1fc2ec132600c65bd97e2d8e8c851daa11c))
+
 ## v0.11.1 (2024-02-03)
 
 ### Fix
