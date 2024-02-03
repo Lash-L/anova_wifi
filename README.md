@@ -1,14 +1,14 @@
 # Anova Wifi
 
 <p align="center">
-  <a href="https://github.com/conway220/anova-wifi/actions?query=workflow%3ACI">
-    <img src="https://img.shields.io/github/workflow/status/conway220/anova-wifi/CI/main?label=CI&logo=github&style=flat-square" alt="CI Status" >
+  <a href="https://github.com/Lash-L/anova-wifi/actions?query=workflow%3ACI">
+    <img src="https://img.shields.io/github/workflow/status/Lash-L/anova-wifi/CI/main?label=CI&logo=github&style=flat-square" alt="CI Status" >
   </a>
   <a href="https://anova-wifi.readthedocs.io">
     <img src="https://img.shields.io/readthedocs/anova-wifi.svg?logo=read-the-docs&logoColor=fff&style=flat-square" alt="Documentation Status">
   </a>
-  <a href="https://codecov.io/gh/conway220/anova-wifi">
-    <img src="https://img.shields.io/codecov/c/github/conway220/anova-wifi.svg?logo=codecov&logoColor=fff&style=flat-square" alt="Test coverage percentage">
+  <a href="https://codecov.io/gh/Lash-L/anova-wifi">
+    <img src="https://img.shields.io/codecov/c/github/Lash-L/anova-wifi.svg?logo=codecov&logoColor=fff&style=flat-square" alt="Test coverage percentage">
   </a>
 </p>
 <p align="center">
@@ -49,7 +49,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/conway220"><img src="https://avatars.githubusercontent.com/u/20257911?v=4?s=80" width="80px;" alt="Luke"/><br /><sub><b>Luke</b></sub></a><br /><a href="https://github.com/conway220/anova-wifi/commits?author=conway220" title="Code">💻</a> <a href="#ideas-conway220" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/conway220/anova-wifi/commits?author=conway220" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Lash-L"><img src="https://avatars.githubusercontent.com/u/20257911?v=4?s=80" width="80px;" alt="Luke"/><br /><sub><b>Luke</b></sub></a><br /><a href="https://github.com/Lash-L/anova-wifi/commits?author=Lash-L" title="Code">💻</a> <a href="#ideas-Lash-L" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/Lash-L/anova-wifi/commits?author=Lash-L" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
@@ -60,7 +60,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 <!-- prettier-ignore-end -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
+Contributions of any kind welcome!
 
 ## Credits
 
@@ -69,4 +70,6 @@ This package was created with
 [browniebroke/pypackage-template](https://github.com/browniebroke/pypackage-template)
 project template.
 
-This is heavily based off of information from [this reddit post](https://www.reddit.com/r/sousvide/comments/p43k18/tracking_my_anovas_status_over_time_using_the_api/) by [/u/InitializedVariable](https://www.reddit.com/user/InitializedVariable)
+This is heavily based off of information
+from [this reddit post](https://www.reddit.com/r/sousvide/comments/p43k18/tracking_my_anovas_status_over_time_using_the_api/)
+by [/u/InitializedVariable](https://www.reddit.com/user/InitializedVariable)

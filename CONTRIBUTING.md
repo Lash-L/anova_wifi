@@ -16,15 +16,18 @@ Report bugs to [our issue page][gh-issues]. If you are reporting a bug, please i
 
 ### Fix Bugs
 
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help wanted" is open to whoever wants to implement it.
+Look through the GitHub issues for bugs. Anything tagged with "bug" and "help wanted" is open to whoever wants to
+implement it.
 
 ### Implement Features
 
-Look through the GitHub issues for features. Anything tagged with "enhancement" and "help wanted" is open to whoever wants to implement it.
+Look through the GitHub issues for features. Anything tagged with "enhancement" and "help wanted" is open to whoever
+wants to implement it.
 
 ### Write Documentation
 
-Anova Wifi could always use more documentation, whether as part of the official Anova Wifi docs, in docstrings, or even on the web in blog posts, articles, and such.
+Anova Wifi could always use more documentation, whether as part of the official Anova Wifi docs, in docstrings, or even
+on the web in blog posts, articles, and such.
 
 ### Submit Feedback
 
@@ -66,7 +69,8 @@ Ready to contribute? Here's how to set yourself up for local development.
    $ poetry run pytest
    ```
 
-6. Linting is done through [pre-commit](https://pre-commit.com). Provided you have the tool installed globally, you can run them all as one-off:
+6. Linting is done through [pre-commit](https://pre-commit.com). Provided you have the tool installed globally, you can
+   run them all as one-off:
 
    ```shell
    $ pre-commit run -a
@@ -86,7 +90,9 @@ Ready to contribute? Here's how to set yourself up for local development.
    $ git push origin name-of-your-bugfix-or-feature
    ```
 
-   Note: the commit message should follow [the conventional commits](https://www.conventionalcommits.org). We run [`commitlint` on CI](https://github.com/marketplace/actions/commit-linter) to validate it, and if you've installed pre-commit hooks at the previous step, the message will be checked at commit time.
+   Note: the commit message should follow [the conventional commits](https://www.conventionalcommits.org). We
+   run [`commitlint` on CI](https://github.com/marketplace/actions/commit-linter) to validate it, and if you've
+   installed pre-commit hooks at the previous step, the message will be checked at commit time.
 
 8. Submit a pull request through the GitHub website or using the GitHub CLI (if you have it installed):
 
@@ -96,7 +102,8 @@ Ready to contribute? Here's how to set yourself up for local development.
 
 ## Pull Request Guidelines
 
-We like to have the pull request open as soon as possible, that's a great place to discuss any piece of work, even unfinished. You can use draft pull request if it's still a work in progress. Here are a few guidelines to follow:
+We like to have the pull request open as soon as possible, that's a great place to discuss any piece of work, even
+unfinished. You can use draft pull request if it's still a work in progress. Here are a few guidelines to follow:
 
 1. Include tests for feature or bug fixes.
 2. Update the documentation for significant features.
@@ -112,6 +119,10 @@ $ pytest tests
 
 ## Making a new release
 
-The deployment should be automated and can be triggered from the Semantic Release workflow in GitHub. The next version will be based on [the commit logs](https://python-semantic-release.readthedocs.io/en/latest/commit-log-parsing.html#commit-log-parsing). This is done by [python-semantic-release](https://python-semantic-release.readthedocs.io/en/latest/index.html) via a GitHub action.
+The deployment should be automated and can be triggered from the Semantic Release workflow in GitHub. The next version
+will be based
+on [the commit logs](https://python-semantic-release.readthedocs.io/en/latest/commit-log-parsing.html#commit-log-parsing).
+This is done by [python-semantic-release](https://python-semantic-release.readthedocs.io/en/latest/index.html) via a
+GitHub action.
 
-[gh-issues]: https://github.com/conway220/anova-wifi/issues
+[gh-issues]: https://github.com/Lash-L/anova-wifi/issues
