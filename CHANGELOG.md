@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.1 (2024-02-03)
+
+### Fix
+
+* Make mock non fixture ([#29](https://github.com/Lash-L/anova_wifi/issues/29)) ([`a1f973a`](https://github.com/Lash-L/anova_wifi/commit/a1f973a7d9d8708aa7c836b984e58bb5caf2b6b1))
+
 ## v0.11.0 (2024-02-03)
 
 ### Feature
