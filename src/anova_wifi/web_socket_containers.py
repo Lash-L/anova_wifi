@@ -35,23 +35,23 @@ class APCUpdate:
 
 
 class AnovaMode(str, Enum):
-    STARTUP = "STARTUP"
-    IDLE = "IDLE"
-    COOK = "COOK"
-    LOW_WATER = "LOW WATER"
-    OTA = "OTA"
-    PROVISIONING = "PROVISIONING"
-    HIGH_TEMP = "HIGH TEMP"
-    DEVICE_FAILURE = "DEVICE FAILURE"
+    startup = "STARTUP"
+    idle = "IDLE"
+    cook = "COOK"
+    low_water = "LOW WATER"
+    ota = "OTA"
+    provisioning = "PROVISIONING"
+    high_temp = "HIGH TEMP"
+    device_failure = "DEVICE FAILURE"
 
 
 class AnovaState(str, Enum):
-    PREHEATING = "PREHEATING"
-    COOKING = "COOKING"
-    MAINTAINING = "MAINTAINING"
-    TIMER_EXPIRED = "TIMER EXPIRED"
-    SET_TIMER = "SET TIMER"
-    NO_STATE = ""
+    preheating = "PREHEATING"
+    cooking = "COOKING"
+    maintaining = "MAINTAINING"
+    timer_expired = "TIMER EXPIRED"
+    set_timer = "SET TIMER"
+    no_state = ""
 
 
 class AnovaCommand(str, Enum):
@@ -163,8 +163,8 @@ class WifiCookerStateBody:
     def to_apc_update(self) -> APCUpdate:
         sensors = APCUpdateSensor(
             cook_time=self.job.cook_time_seconds,
-            mode=self.job.mode.value,
-            state=self.job_status.state.value,
+            mode=self.job.mode.name,
+            state=self.job_status.state.name,
             target_temperature=self.job.target_temperature,
             cook_time_remaining=self.job_status.cook_time_remaining,
             firmware_version=self.firmware_version,
@@ -174,11 +174,11 @@ class WifiCookerStateBody:
         )
 
         binary_sensors = APCUpdateBinary(
-            cooking=bool(self.job.mode == AnovaMode.COOK),
-            preheating=bool(self.job_status.state == AnovaState.PREHEATING),
+            cooking=bool(self.job.mode == AnovaMode.cook),
+            preheating=bool(self.job_status.state == AnovaState.preheating),
             maintaining=bool(
-                self.job_status.state == AnovaState.MAINTAINING
-                or self.job_status.state == AnovaState.TIMER_EXPIRED
+                self.job_status.state == AnovaState.maintaining
+                or self.job_status.state == AnovaState.timer_expired
             ),
             device_safe=self.pin_info.is_device_safe,
             water_leak=self.pin_info.is_water_leak,
