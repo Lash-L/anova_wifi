@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 from aiohttp import ClientSession
 
-from anova_wifi import AnovaWebsocketHandler
+from anova_wifi import AnovaWebsocketHandler, NoDevicesFound
 
 DUMMY_ID = "anova_id"
 
@@ -146,6 +146,8 @@ def anova_api_mock(
             ],
         )
         await api_mock.websocket_handler.connect()
+        if not api_mock.websocket_handler.devices:
+            raise NoDevicesFound("No devices were found on the websocket.")
 
     api_mock.authenticate.side_effect = authenticate_side_effect
     api_mock.create_websocket.side_effect = create_websocket_side_effect
