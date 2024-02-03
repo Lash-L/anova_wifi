@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.3 (2024-02-03)
+
+### Fix
+
+* Add ability to override websocket stream messages ([`73e8914`](https://github.com/Lash-L/anova_wifi/commit/73e8914ef059e961dce448bd080ecacf3212bd58))
+
 ## v0.11.2 (2024-02-03)
 
 ### Fix
