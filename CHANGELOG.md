@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.4 (2024-02-03)
+
+### Fix
+
+* Make enums lower case ([`0dd1699`](https://github.com/Lash-L/anova_wifi/commit/0dd169975d153de01a1e9a904ea86272a3df8042))
+
 ## v0.11.3 (2024-02-03)
 
 ### Fix
