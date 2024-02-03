@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.6 (2024-02-03)
+
+### Fix
+
+* Raise no devices found if needed ([`61a5269`](https://github.com/Lash-L/anova_wifi/commit/61a52695036b26484b28c01d536a3f326fe1a2ba))
+
 ## v0.11.5 (2024-02-03)
 
 ### Fix
