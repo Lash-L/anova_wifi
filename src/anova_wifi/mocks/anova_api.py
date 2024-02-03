@@ -60,7 +60,7 @@ class MockedAnovaWebsocketHandler(AnovaWebsocketHandler):
         asyncio.ensure_future(self.message_listener())
 
 
-async def anova_api() -> AsyncMock:
+async def anova_api_mock() -> AsyncMock:
     """Mock the api for Anova."""
     api_mock = AsyncMock()
 
