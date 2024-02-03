@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.5 (2024-02-03)
+
+### Fix
+
+* Use my new github username ([`fbcf8d8`](https://github.com/Lash-L/anova_wifi/commit/fbcf8d8638750096696e962a33a1e258bc28e81c))
+
 ## v0.11.4 (2024-02-03)
 
 ### Fix
