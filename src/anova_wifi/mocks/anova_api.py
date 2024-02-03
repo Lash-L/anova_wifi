@@ -62,7 +62,7 @@ class MockedAnovaWebsocketHandler(AnovaWebsocketHandler):
 
 
 @pytest.fixture
-async def anova_api() -> AsyncGenerator[AnovaApi, None]:
+def anova_api() -> AsyncGenerator[AnovaApi, None]:
     """Mock the api for Anova."""
     api_mock = AsyncMock()
 
