@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.0 (2024-02-03)
+
+### Feature
+
+* Add mocks to library ([#28](https://github.com/Lash-L/anova_wifi/issues/28)) ([`f10e5a8`](https://github.com/Lash-L/anova_wifi/commit/f10e5a856f63343ada6677a70670c85f127f348e))
+
 ## v0.10.6 (2024-01-19)
 
 ### Fix
