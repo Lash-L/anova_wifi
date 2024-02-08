@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.7 (2024-02-08)
+
+### Fix
+
+* Typo in repository URL ([#32](https://github.com/Lash-L/anova_wifi/issues/32)) ([`84b7372`](https://github.com/Lash-L/anova_wifi/commit/84b73729eb95cda1b8ff765d9cdd21f2e08f8cdd))
+
 ## v0.11.6 (2024-02-03)
 
 ### Fix
