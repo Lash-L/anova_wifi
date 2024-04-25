@@ -4,7 +4,9 @@ import logging
 from typing import Any
 
 from aiohttp import ClientSession, ClientWebSocketResponse
+from aiohttp import WebSocketError, WSHandshakeError
 
+from . import WebsocketFailure
 from .web_socket_containers import (
     AnovaCommand,
     APCWifiDevice,
@@ -24,7 +26,10 @@ class AnovaWebsocketHandler:
         self.ws: ClientWebSocketResponse | None = None
 
     async def connect(self) -> None:
-        self.ws = await self.session.ws_connect(self.url)
+        try:
+            self.ws = await self.session.ws_connect(self.url)
+        except (WebSocketError, WSHandshakeError) as ex:
+            raise WebsocketFailure("Failed to connect to the websocket") from ex
         asyncio.ensure_future(self.message_listener())
 
     async def disconnect(self) -> None:
