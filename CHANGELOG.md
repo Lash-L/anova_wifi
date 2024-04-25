@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.0 (2024-04-25)
+
+### Feature
+
+* Websocket error raising ([`5f020db`](https://github.com/Lash-L/anova_wifi/commit/5f020dbbb6b7a7a5fc6fa6c911ecc1d340e511a2))
+
+### Fix
+
+* Poetry update ([`5611851`](https://github.com/Lash-L/anova_wifi/commit/561185163f6c71106189886b9cc6328d12614d12))
+* Raise WebsocketError ([`27cd01f`](https://github.com/Lash-L/anova_wifi/commit/27cd01f1c6ab017a428294189c150ca64df6a2ae))
+* Raise no devices found if needed ([`61a5269`](https://github.com/Lash-L/anova_wifi/commit/61a52695036b26484b28c01d536a3f326fe1a2ba))
+
 ## v0.11.5 (2024-02-03)
 
 ### Fix
