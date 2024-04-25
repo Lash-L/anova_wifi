@@ -3,8 +3,12 @@ import json
 import logging
 from typing import Any
 
-from aiohttp import ClientSession, ClientWebSocketResponse
-from aiohttp import WebSocketError, WSHandshakeError
+from aiohttp import (
+    ClientSession,
+    ClientWebSocketResponse,
+    WebSocketError,
+    WSHandshakeError,
+)
 
 from . import WebsocketFailure
 from .web_socket_containers import (
