@@ -26,7 +26,7 @@ from .web_socket_containers import (
 )
 from .websocket_handler import AnovaWebsocketHandler
 
-__version__ = "0.12.0"
+__version__ = "0.13.0"
 
 __all__ = [
     "AnovaApi",
