@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.0 (2024-06-26)
+
+### Feature
+
+* Add support for A3 ([`7ea5a6e`](https://github.com/Lash-L/anova_wifi/commit/7ea5a6e69bbc88828028d735b4194f1b821281f5))
+
 ## v0.13.0 (2024-06-12)
 
 ### Feature
