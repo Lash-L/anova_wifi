@@ -6,5 +6,5 @@ def test_a3_payload():
     resp = build_a3_payload(A3_MESSAGE["payload"]["state"])
     # Ensure some of the basics
     assert resp.sensor.target_temperature == 96.1
-    assert resp.sensor.state == AnovaA3State.cooking
+    assert resp.sensor.a3_state == AnovaA3State.cooking
     assert resp.sensor.cook_time_remaining == 840

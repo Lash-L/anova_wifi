@@ -8,24 +8,25 @@ class APCUpdateBinary:
     cooking: bool
     preheating: bool
     maintaining: bool
-    device_safe: bool | None
-    water_leak: bool | None
-    water_level_critical: bool | None
-    water_temp_too_high: bool | None
-    water_level_low: bool | None
+    device_safe: bool | None = None
+    water_leak: bool | None = None
+    water_level_critical: bool | None = None
+    water_temp_too_high: bool | None = None
+    water_level_low: bool | None = None
 
 
 @dataclass
 class APCUpdateSensor:
-    cook_time: int | None
-    mode: str | None
-    state: str
-    target_temperature: float
-    cook_time_remaining: int | None
-    firmware_version: str
-    heater_temperature: float | None
-    triac_temperature: float | None
-    water_temperature: float
+    cook_time: int | None = None
+    mode: str | None = None
+    state: str | None = None
+    a3_state: str | None = None
+    target_temperature: float | None = None
+    cook_time_remaining: int | None = None
+    firmware_version: str | None = None
+    heater_temperature: float | None = None
+    triac_temperature: float | None = None
+    water_temperature: float | None = None
 
 
 @dataclass
@@ -304,14 +305,10 @@ def build_a3_payload(apc_response: dict[str, Any]) -> APCUpdate:
     job_stage: str = current_job["jobStage"]
     status = AnovaA3State(job_stage)
     sensors = APCUpdateSensor(
-        cook_time=None,
-        mode=None,
-        state=status,
+        a3_state=status,
         target_temperature=float(target_temperature),
         cook_time_remaining=int(timer_in_seconds),
         firmware_version=firmware_version,
-        heater_temperature=None,
-        triac_temperature=None,
         water_temperature=float(current_temperature),
     )
 
@@ -321,11 +318,6 @@ def build_a3_payload(apc_response: dict[str, Any]) -> APCUpdate:
         maintaining=bool(
             status == AnovaState.maintaining or status == AnovaState.timer_expired
         ),
-        device_safe=None,
-        water_leak=None,
-        water_level_critical=None,
-        water_temp_too_high=None,
-        water_level_low=None,
     )
     return APCUpdate(binary_sensors, sensors)
 

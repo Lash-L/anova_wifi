@@ -7,6 +7,7 @@ from .exceptions import (
 )
 from .parser import AnovaApi
 from .web_socket_containers import (
+    AnovaA3State,
     AnovaCommand,
     AnovaMode,
     AnovaState,
@@ -52,4 +53,5 @@ __all__ = [
     "WifiCookerStateBody",
     "build_wifi_cooker_state_body",
     "AnovaWebsocketHandler",
+    "AnovaA3State",
 ]
