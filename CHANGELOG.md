@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.15.0 (2024-07-04)
+
+### Feature
+
+* Add support for A4 ([`a554dd0`](https://github.com/Lash-L/anova_wifi/commit/a554dd00c366394708bed8e12c659e15b6463d99))
+
 ## v0.14.0 (2024-06-26)
 
 ### Feature
