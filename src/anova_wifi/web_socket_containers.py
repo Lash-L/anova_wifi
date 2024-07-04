@@ -2,6 +2,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable
 
+# All of the containers would probably be better of using dacite, but since HA sometimes has issues with dacite I am
+# doing them manually
+
 
 @dataclass
 class APCUpdateBinary:
@@ -126,8 +129,13 @@ class WifiSystemInfo:
 @dataclass
 class WifiSystemInfo3220:
     firmware_version: str
-    has_real_cert_catalog: str
-    firmware_version_raw: str
+    has_real_cert_catalog: str | None = None
+    firmware_version_raw: str | None = None
+    largest_free_heap_size: int | None = None
+    stack_low_level: int | None = None
+    stack_low_task: int | None = None
+    systick: int | None = None
+    total_free_heap_size: int | None = None
 
 
 @dataclass
@@ -251,10 +259,19 @@ def build_wifi_cooker_state_body(apc_response: dict[str, Any]) -> WifiCookerStat
         )
     system_info_3220_json: dict[str, str] | None = apc_response.get("system-info-3220")
     if system_info_3220_json:
+        largest_free_heap_size = system_info_3220_json.get("largest-free-heap-size")
         system_info_3220 = WifiSystemInfo3220(
             firmware_version=system_info_3220_json["firmware-version"],
-            has_real_cert_catalog=system_info_3220_json["has-real-cert-catalog"],
-            firmware_version_raw=system_info_3220_json["firmware-version-raw"],
+            has_real_cert_catalog=system_info_3220_json.get("has-real-cert-catalog"),
+            firmware_version_raw=system_info_3220_json.get("firmware-version-raw"),
+            largest_free_heap_size=int(largest_free_heap_size)
+            if largest_free_heap_size is not None
+            else None,
+            # Too lazy to do these right now.
+            # stack_low_level=system_info_3220_json.get("stack-low-level"),
+            # stack_low_task=system_info_3220_json.get("stack-low-task"),
+            # systick=system_info_3220_json.get("systick"),
+            # total_free_heap_size=system_info_3220_json.get("total-free-heap-size"),
         )
     system_info_nxp_json: dict[str, str] | None = apc_response.get("system-info-nxp")
     if system_info_nxp_json:
@@ -305,7 +322,7 @@ def build_a3_payload(apc_response: dict[str, Any]) -> APCUpdate:
     job_stage: str = current_job["jobStage"]
     status = AnovaA3State(job_stage)
     sensors = APCUpdateSensor(
-        a3_state=status,
+        a3_state=status.name,
         target_temperature=float(target_temperature),
         cook_time_remaining=int(timer_in_seconds),
         firmware_version=firmware_version,
