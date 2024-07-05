@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "anova-wifi"
-version = "0.16.0"
+version = "0.17.0"
 description = "A package to get read only data from Anova precision cookers with wifi"
 authors = ["Luke <conway220@gmail.com>"]
 license = "MIT"

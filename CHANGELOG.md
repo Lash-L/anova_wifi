@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.0 (2024-07-05)
+
+### Feature
+
+* Add support for A6/A7 ([`3726d6a`](https://github.com/Lash-L/anova_wifi/commit/3726d6a5855365c47eb6b5d88326152df2a498fd))
+
 ## v0.16.0 (2024-07-05)
 
 ### Feature
