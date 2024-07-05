@@ -11,6 +11,7 @@ from .web_socket_containers import (
     AnovaCommand,
     APCWifiDevice,
     build_a3_payload,
+    build_a6_a7_payload,
     build_wifi_cooker_state_body,
 )
 
@@ -61,8 +62,12 @@ class AnovaWebsocketHandler:
                     update = build_wifi_cooker_state_body(
                         message["payload"]["state"]
                     ).to_apc_update()
-                else:
+                elif message["payload"]["type"] == "a3":
                     update = build_a3_payload(message["payload"]["state"])
+                elif message["payload"]["type"] in {"a6", "a7"}:
+                    update = build_a6_a7_payload(message["payload"]["state"])
+                else:
+                    return
                 ul(update)
 
     async def message_listener(self) -> None:
