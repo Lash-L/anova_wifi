@@ -9,8 +9,8 @@ from typing import Any, Callable
 @dataclass
 class APCUpdateBinary:
     cooking: bool
-    preheating: bool
-    maintaining: bool
+    preheating: bool | None = None
+    maintaining: bool | None = None
     device_safe: bool | None = None
     water_leak: bool | None = None
     water_level_critical: bool | None = None
@@ -121,9 +121,9 @@ class WifiPinInfo:
 
 @dataclass
 class WifiSystemInfo:
-    class_name: str | None
     firmware_version: str
-    type: str
+    class_name: str | None = None
+    type: str | None = None
 
 
 @dataclass
@@ -255,7 +255,7 @@ def build_wifi_cooker_state_body(apc_response: dict[str, Any]) -> WifiCookerStat
         system_info = WifiSystemInfo(
             firmware_version=system_info_json["firmware-version"],
             class_name=system_info_json.get("class"),
-            type=system_info_json["type"],
+            type=system_info_json.get("type"),
         )
     system_info_3220_json: dict[str, str] | None = apc_response.get("system-info-3220")
     if system_info_3220_json:
@@ -312,15 +312,18 @@ def build_a3_payload(apc_response: dict[str, Any]) -> APCUpdate:
     # is_speaker_on = apc_response.get("isSpeakerOn")
     # is_alarm_active = apc_response.get("isAlarmActive")
     # current_job_id = apc_response.get("currentJobID")
-    current_job: dict[str, Any] = apc_response["currentJob"]
+    current_job = apc_response.get("currentJob")
     # is_keeping_warm = apc_response.get("isKeepingWarming")
     # is_checking_temperature_for_ice_bath = apc_response.get(
     #     "isCheckingTemperatureForIceBath"
     # )
     # is_monitoring_ice_bath = apc_response.get("isMonitoringIcebath")
     # is_connected = apc_response.get("isConnected")
-    job_stage: str = current_job["jobStage"]
-    status = AnovaA3State(job_stage)
+    if current_job is not None:
+        job_stage: str = current_job["jobStage"]
+        status = AnovaA3State(job_stage)
+    else:
+        status = AnovaA3State.no_state
     sensors = APCUpdateSensor(
         a3_state=status.name,
         target_temperature=float(target_temperature),
@@ -335,6 +338,28 @@ def build_a3_payload(apc_response: dict[str, Any]) -> APCUpdate:
         maintaining=bool(
             status == AnovaState.maintaining or status == AnovaState.timer_expired
         ),
+    )
+    return APCUpdate(binary_sensors, sensors)
+
+
+def build_a6_a7_payload(apc_response: dict[str, Any]) -> APCUpdate:
+    system_info = apc_response["systemInfo"]
+    firmware_version = system_info["firmwareVersion"]
+    mode = apc_response["state"]["mode"]
+    nodes = apc_response["nodes"]
+    sensors = APCUpdateSensor(
+        firmware_version=firmware_version,
+        mode=mode,
+        water_temperature=float(nodes["waterTemperatureSensor"]["current"]["celsius"]),
+        target_temperature=float(
+            nodes["waterTemperatureSensor"]["setpoint"]["celsius"]
+        ),
+        cook_time=int(nodes["timer"]["initial"]),
+    )
+    binary_sensors = APCUpdateBinary(
+        cooking=bool(mode == "cook"),
+        water_level_low=bool(nodes["lowWater"]["warning"]),
+        water_level_critical=bool(nodes["lowWater"]["empty"]),
     )
     return APCUpdate(binary_sensors, sensors)
 

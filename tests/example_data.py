@@ -188,3 +188,93 @@ A7_MESSAGE: dict[str, Any] = {
         },
     },
 }
+
+A7_COOKING: dict[str, Any] = {
+    "command": "EVENT_APC_STATE",
+    "payload": {
+        "cookerId": "a7_id",
+        "type": "a7",
+        "state": {
+            "cook": {
+                "activeStageIndex": 0,
+                "stageTransitionPendingUserAction": False,
+                "activeStageId": "6b70634f-ed6b-9154-6b30-05e73cec7a4e",
+                "stages": [
+                    {
+                        "do": {
+                            "timer": {
+                                "entry": {
+                                    "conditions": {
+                                        "and": {
+                                            "nodes.waterTemperatureSensor.current.celsius": {
+                                                ">=": 54.17,
+                                                "<=": 54.77,
+                                            }
+                                        }
+                                    }
+                                },
+                                "initial": 0,
+                            },
+                            "type": "cook",
+                            "waterTemperatureSensor": {"setpoint": {"celsius": 54.47}},
+                        },
+                        "id": "6b70634f-ed6b-9154-6b30-05e73cec7a4e",
+                        "entry": {
+                            "conditions": {
+                                "and": {
+                                    "nodes.waterTemperatureSensor.current.celsius": {
+                                        "<=": 54.77,
+                                        ">=": 54.17,
+                                    }
+                                }
+                            }
+                        },
+                        "exit": {"conditions": {}},
+                        "title": "Cook Stage",
+                    }
+                ],
+                "originSource": "hardware",
+                "activeStageStartedTimestamp": "2024-07-05T21:48:29Z",
+                "startedTimestamp": "2024-07-05T21:48:29Z",
+                "activeStageMode": "running",
+                "cookId": "a098de4a-8714-2dd8-1bdc-d067008f2d4f",
+            },
+            "nodes": {
+                "lowWater": {"empty": False, "warning": False},
+                "timer": {
+                    "mode": "running",
+                    "initial": 1200,
+                    "startedAtTimestamp": "2024-07-05T21:49:10Z",
+                },
+                "waterTemperatureSensor": {
+                    "enabled": True,
+                    "setpoint": {"celsius": 54.46},
+                    "current": {"celsius": 55.27},
+                },
+            },
+            "state": {
+                "temperatureUnit": "F",
+                "resumeAfterPowerInterruption": False,
+                "processedCommandIds": [
+                    "876cfbc9-03f1-400b-89ec-ef5391270846",
+                    "e2e3ce06-45b4-4485-b4fa-9211c082b90d",
+                ],
+                "mode": "cook",
+            },
+            "systemInfo": {
+                "firmwareVersion": "01.01.25",
+                "deviceId": "5yMOd0D2lasOE2U8SkcIcS",
+                "lastDisconnectedTimestamp": "2024-07-05T21:47:59Z",
+                "triacsFailed": False,
+                "releaseTrack": "production",
+                "hardwareVersion": "1.0.0",
+                "lastConnectedTimestamp": "2024-07-05T21:47:59Z",
+                "online": True,
+                "firmwareUpdatedTimestamp": "2024-06-07T18:56:03Z",
+            },
+            "metadata": {},
+            "updatedTimestamp": "2024-07-05T21:49:56Z",
+            "version": 1,
+        },
+    },
+}
