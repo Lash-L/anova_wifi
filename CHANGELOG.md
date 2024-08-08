@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.1 (2024-08-08)
+
+### Fix
+
+* Make tests compatible with aiohttp 3.10 ([#60](https://github.com/Lash-L/anova_wifi/issues/60)) ([`be3d534`](https://github.com/Lash-L/anova_wifi/commit/be3d534da8d8186a39e3dcfffad3eacbc2892bdb))
+
 ## v0.17.0 (2024-07-05)
 
 ### Feature
