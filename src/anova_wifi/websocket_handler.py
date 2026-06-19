@@ -17,6 +17,11 @@ from .web_socket_containers import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# Anova's server never sends anything when a device is idle, so without a
+# heartbeat aiohttp has no way to detect a connection that has died silently
+# (e.g. a NAT/router timeout) instead of via a clean close frame.
+WEBSOCKET_HEARTBEAT_SECONDS = 30
+
 
 class AnovaWebsocketHandler:
     def __init__(self, firebase_jwt: str, jwt: str, session: ClientSession):
@@ -30,7 +35,9 @@ class AnovaWebsocketHandler:
 
     async def connect(self) -> None:
         try:
-            self.ws = await self.session.ws_connect(self.url)
+            self.ws = await self.session.ws_connect(
+                self.url, heartbeat=WEBSOCKET_HEARTBEAT_SECONDS
+            )
         except WebSocketError as ex:
             raise WebsocketFailure("Failed to connect to the websocket") from ex
         self._message_listener = asyncio.ensure_future(self.message_listener())
