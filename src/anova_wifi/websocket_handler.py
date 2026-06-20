@@ -1,12 +1,13 @@
 import asyncio
 import json
 import logging
+import uuid
 from asyncio import Future
 from typing import Any
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WebSocketError
 
-from . import WebsocketFailure
+from . import CommandFailure, WebsocketFailure
 from .web_socket_containers import (
     AnovaCommand,
     APCWifiDevice,
@@ -16,6 +17,9 @@ from .web_socket_containers import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+# How long to wait for a RESPONSE to a sent command before raising CommandFailure.
+COMMAND_TIMEOUT = 10
 
 
 class AnovaWebsocketHandler:
@@ -27,6 +31,8 @@ class AnovaWebsocketHandler:
         self.devices: dict[str, APCWifiDevice] = {}
         self.ws: ClientWebSocketResponse | None = None
         self._message_listener: Future[None] | None = None
+        # Requests awaiting a matching RESPONSE message, keyed by requestId.
+        self._pending_commands: dict[str, Future[None]] = {}
 
     async def connect(self) -> None:
         try:
@@ -41,6 +47,34 @@ class AnovaWebsocketHandler:
         if self._message_listener is not None:
             self._message_listener.cancel()
 
+    async def send_command(
+        self, command: AnovaCommand, payload: dict[str, Any]
+    ) -> None:
+        """Send a command and wait for the device to acknowledge it via RESPONSE.
+
+        The requestId/RESPONSE correlation scheme is inferred from the RESPONSE
+        entry in AnovaCommand and has not been confirmed against a packet
+        capture of a real command exchange - verify before depending on this
+        against a real device.
+        """
+        if self.ws is None:
+            raise WebsocketFailure("Cannot send a command, the websocket is not connected.")
+        request_id = str(uuid.uuid4())
+        future: Future[None] = asyncio.get_event_loop().create_future()
+        self._pending_commands[request_id] = future
+        try:
+            await self.ws.send_json(
+                {"command": command.value, "requestId": request_id, "payload": payload}
+            )
+            async with asyncio.timeout(COMMAND_TIMEOUT):
+                await future
+        except TimeoutError as ex:
+            raise CommandFailure(
+                f"Timed out waiting for a response to {command.value}"
+            ) from ex
+        finally:
+            self._pending_commands.pop(request_id, None)
+
     def on_message(self, message: dict[str, Any]) -> None:
         _LOGGER.debug("Found message %s", message)
         if message["command"] == AnovaCommand.EVENT_APC_WIFI_LIST:
@@ -52,6 +86,7 @@ class AnovaWebsocketHandler:
                         type=device["type"],
                         paired_at=device["pairedAt"],
                         name=device["name"],
+                        send_command=self.send_command,
                     )
         elif message["command"] == AnovaCommand.EVENT_APC_STATE:
             cooker_id = message["payload"]["cookerId"]
@@ -69,6 +104,19 @@ class AnovaWebsocketHandler:
                 else:
                     return
                 ul(update)
+        elif message["command"] == AnovaCommand.RESPONSE:
+            self._resolve_pending_command(message)
+
+    def _resolve_pending_command(self, message: dict[str, Any]) -> None:
+        request_id = message.get("requestId")
+        future = self._pending_commands.get(request_id)
+        if future is None or future.done():
+            return
+        payload = message.get("payload") or {}
+        if payload.get("success", True):
+            future.set_result(None)
+        else:
+            future.set_exception(CommandFailure(f"Command was rejected: {payload}"))
 
     async def message_listener(self) -> None:
         if self.ws is not None:
