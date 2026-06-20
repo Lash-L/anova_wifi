@@ -38,6 +38,12 @@ Install this via pip (or your favourite package manager):
 
 `pip install anova-wifi`
 
+## Design notes
+
+Design decisions for non-obvious parts of the library, including the rationale
+for how command-sending is structured for Home Assistant consumers, are
+recorded in [`docs/design/`](docs/design/).
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):

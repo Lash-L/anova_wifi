@@ -1,6 +1,7 @@
 from .exceptions import (
     AnovaException,
     AnovaOffline,
+    CommandFailure,
     InvalidLogin,
     NoDevicesFound,
     WebsocketFailure,
@@ -36,6 +37,7 @@ __all__ = [
     "InvalidLogin",
     "NoDevicesFound",
     "WebsocketFailure",
+    "CommandFailure",
     "APCUpdate",
     "APCUpdateSensor",
     "APCUpdateBinary",
