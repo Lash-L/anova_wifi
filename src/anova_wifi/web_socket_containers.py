@@ -1,6 +1,9 @@
-from dataclasses import dataclass
+from collections.abc import Coroutine
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable
+
+from .exceptions import WebsocketFailure
 
 # All of the containers would probably be better of using dacite, but since HA sometimes has issues with dacite I am
 # doing them manually
@@ -364,6 +367,48 @@ def build_a6_a7_payload(apc_response: dict[str, Any]) -> APCUpdate:
     return APCUpdate(binary_sensors, sensors)
 
 
+def build_set_target_temperature_payload(
+    cooker_id: str, target_temperature: float, temperature_unit: str
+) -> dict[str, Any]:
+    """Build the payload for CMD_APC_SET_TARGET_TEMP.
+
+    Field names are inferred from the receive-side schema (see
+    ``WifiJob``/``build_wifi_cooker_state_body``) and have not been confirmed
+    against a packet capture of an outgoing command. Verify before relying on
+    this against a real device.
+    """
+    return {
+        "cookerId": cooker_id,
+        "targetTemperature": target_temperature,
+        "temperatureUnit": temperature_unit,
+    }
+
+
+def build_start_cook_payload(
+    cooker_id: str,
+    target_temperature: float,
+    cook_time_seconds: int,
+    temperature_unit: str,
+) -> dict[str, Any]:
+    """Build the payload for CMD_APC_START. See build_set_target_temperature_payload."""
+    return {
+        "cookerId": cooker_id,
+        "targetTemperature": target_temperature,
+        "cookTimeSeconds": cook_time_seconds,
+        "temperatureUnit": temperature_unit,
+    }
+
+
+def build_stop_cook_payload(cooker_id: str) -> dict[str, Any]:
+    """Build the payload for CMD_APC_STOP. See build_set_target_temperature_payload."""
+    return {"cookerId": cooker_id}
+
+
+def build_set_timer_payload(cooker_id: str, cook_time_seconds: int) -> dict[str, Any]:
+    """Build the payload for CMD_APC_SET_TIMER. See build_set_target_temperature_payload."""
+    return {"cookerId": cooker_id, "cookTimeSeconds": cook_time_seconds}
+
+
 @dataclass
 class APCWifiDevice:
     cooker_id: str
@@ -371,6 +416,59 @@ class APCWifiDevice:
     paired_at: str
     name: str
     update_listener: Callable[[APCUpdate], None] | None = None
+    # Injected by AnovaWebsocketHandler when the device is discovered, mirroring
+    # update_listener: a callback rather than a back-reference to the handler,
+    # to avoid a circular import between this module and websocket_handler.py.
+    send_command: (
+        Callable[[AnovaCommand, dict[str, Any]], Coroutine[Any, Any, None]] | None
+    ) = field(default=None, repr=False, compare=False)
 
     def set_update_listener(self, update_function: Callable[[APCUpdate], None]) -> None:
         self.update_listener = update_function
+
+    def _require_send_command(
+        self,
+    ) -> Callable[[AnovaCommand, dict[str, Any]], Coroutine[Any, Any, None]]:
+        if self.send_command is None:
+            raise WebsocketFailure(
+                "This device is not attached to an active websocket connection."
+            )
+        return self.send_command
+
+    async def set_target_temperature(
+        self, target_temperature: float, temperature_unit: str
+    ) -> None:
+        """Set the target temperature for the current or next cook."""
+        await self._require_send_command()(
+            AnovaCommand.CMD_APC_SET_TARGET_TEMP,
+            build_set_target_temperature_payload(
+                self.cooker_id, target_temperature, temperature_unit
+            ),
+        )
+
+    async def start_cook(
+        self,
+        target_temperature: float,
+        cook_time_seconds: int,
+        temperature_unit: str,
+    ) -> None:
+        """Start a cook with the given target temperature and timer."""
+        await self._require_send_command()(
+            AnovaCommand.CMD_APC_START,
+            build_start_cook_payload(
+                self.cooker_id, target_temperature, cook_time_seconds, temperature_unit
+            ),
+        )
+
+    async def stop_cook(self) -> None:
+        """Stop the current cook."""
+        await self._require_send_command()(
+            AnovaCommand.CMD_APC_STOP, build_stop_cook_payload(self.cooker_id)
+        )
+
+    async def set_timer(self, cook_time_seconds: int) -> None:
+        """Set the cook timer without changing the cook's running state."""
+        await self._require_send_command()(
+            AnovaCommand.CMD_APC_SET_TIMER,
+            build_set_timer_payload(self.cooker_id, cook_time_seconds),
+        )

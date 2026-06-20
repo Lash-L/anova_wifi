@@ -20,3 +20,7 @@ class WebsocketFailure(AnovaException):
 
 class LoginUnreachable(AnovaException):
     pass
+
+
+class CommandFailure(AnovaException):
+    """Raised when a command sent to a device is rejected or times out."""

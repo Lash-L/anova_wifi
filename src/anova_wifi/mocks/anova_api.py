@@ -6,7 +6,12 @@ from unittest.mock import AsyncMock
 
 from aiohttp import ClientSession
 
-from anova_wifi import AnovaWebsocketHandler, NoDevicesFound
+from anova_wifi import (
+    AnovaCommand,
+    AnovaWebsocketHandler,
+    CommandFailure,
+    NoDevicesFound,
+)
 
 DUMMY_ID = "anova_id"
 
@@ -47,10 +52,15 @@ class MockedAnovaWebsocketHandler(AnovaWebsocketHandler):
         session: ClientSession,
         connect_messages: list[MockedanovaWebsocketMessage],
         post_connect_messages: list[MockedanovaWebsocketMessage],
+        fail_commands: bool = False,
     ):
         super().__init__(firebase_jwt, jwt, session)
         self.connect_messages = connect_messages
         self.post_connect_messages = post_connect_messages
+        # fail_commands lets tests exercise the CommandFailure path without
+        # needing to simulate a real RESPONSE message.
+        self.fail_commands = fail_commands
+        self.sent_commands: list[dict[str, Any]] = []
 
     async def connect(self) -> None:
         """Create a future for the message listener."""
@@ -59,10 +69,19 @@ class MockedAnovaWebsocketHandler(AnovaWebsocketHandler):
         self.ws = MockedAnovaWebsocketStream(self.post_connect_messages)
         asyncio.ensure_future(self.message_listener())
 
+    async def send_command(
+        self, command: AnovaCommand, payload: dict[str, Any]
+    ) -> None:
+        """Record the command instead of sending it over a real websocket."""
+        self.sent_commands.append({"command": command.value, "payload": payload})
+        if self.fail_commands:
+            raise CommandFailure("Simulated command failure")
+
 
 def anova_api_mock(
     connect_messages: list[MockedanovaWebsocketMessage] | None = None,
     post_connect_messages: list[MockedanovaWebsocketMessage] | None = None,
+    fail_commands: bool = False,
 ) -> AsyncMock:
     """Mock the api for Anova."""
     api_mock = AsyncMock()
@@ -144,6 +163,7 @@ def anova_api_mock(
                     }
                 ),
             ],
+            fail_commands=fail_commands,
         )
         await api_mock.websocket_handler.connect()
         if not api_mock.websocket_handler.devices:
