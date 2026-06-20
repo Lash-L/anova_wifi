@@ -32,9 +32,19 @@ pytest-asyncio = ">0.21.0"
 
 [tool.semantic_release]
 branch = "main"
-version_toml = "pyproject.toml:tool.poetry.version"
-version_variable = "src/anova_wifi/__init__.py:__version__"
+version_toml = ["pyproject.toml:tool.poetry.version"]
+version_variables = ["src/anova_wifi/__init__.py:__version__"]
 build_command = "pip install poetry && poetry build"
+changelog_file = "CHANGELOG.md"
+commit = true
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false
+
+[tool.semantic_release.branches.temp-main-branch]
+match = "temp-main-branch"
+prerelease = false
 
 [tool.pytest.ini_options]
 addopts = "-v -Wdefault --cov=anova_wifi --cov-report=term-missing:skip-covered"
@@ -85,17 +95,10 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.semantic_release.commit_parser_options]
 allowed_tags = [
-    "build",
     "chore",
-    "ci",
     "docs",
     "feat",
     "fix",
-    "perf",
-    "style",
     "refactor",
-    "test",
 ]
-minor_tags = ["feat"]
-patch_tags = ["fix", "perf"]
-major_tags = ["refator"]
+major_tags = ["refactor"]
