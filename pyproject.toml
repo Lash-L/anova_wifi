@@ -101,4 +101,3 @@ allowed_tags = [
     "fix",
     "refactor",
 ]
-major_tags = ["refactor"]
