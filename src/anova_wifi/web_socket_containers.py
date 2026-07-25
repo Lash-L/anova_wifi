@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from typing import Any, Callable
 
@@ -342,22 +343,65 @@ def build_a3_payload(apc_response: dict[str, Any]) -> APCUpdate:
     return APCUpdate(binary_sensors, sensors)
 
 
+def _parse_anova_timestamp(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.endswith("Z"):
+        value = f"{value[:-1]}+00:00"
+    return datetime.fromisoformat(value)
+
+
 def build_a6_a7_payload(apc_response: dict[str, Any]) -> APCUpdate:
     system_info = apc_response["systemInfo"]
     firmware_version = system_info["firmwareVersion"]
     mode = apc_response["state"]["mode"]
     nodes = apc_response["nodes"]
+    timer = nodes["timer"]
+    timer_mode = timer.get("mode")
+    cook = apc_response.get("cook") or {}
+    active_stage_mode = cook.get("activeStageMode")
+    cook_time = int(timer.get("initial") or 0)
+    cook_time_remaining = 0
+
+    if mode == "cook":
+        if timer_mode == "completed":
+            state = AnovaState.timer_expired
+            cook_time_remaining = 0
+        elif active_stage_mode == "entering":
+            state = AnovaState.preheating
+            cook_time_remaining = cook_time
+        elif timer_mode == "running":
+            state = AnovaState.cooking
+            started_at = _parse_anova_timestamp(timer.get("startedAtTimestamp"))
+            updated_at = _parse_anova_timestamp(apc_response.get("updatedTimestamp"))
+            if started_at is not None and updated_at is not None:
+                elapsed = int((updated_at - started_at).total_seconds())
+                cook_time_remaining = max(0, cook_time - elapsed)
+            else:
+                cook_time_remaining = cook_time
+        else:
+            state = AnovaState.maintaining
+            cook_time_remaining = cook_time
+    else:
+        state = AnovaState.no_state
+
     sensors = APCUpdateSensor(
         firmware_version=firmware_version,
         mode=mode,
+        state=state.name,
         water_temperature=float(nodes["waterTemperatureSensor"]["current"]["celsius"]),
         target_temperature=float(
             nodes["waterTemperatureSensor"]["setpoint"]["celsius"]
         ),
-        cook_time=int(nodes["timer"]["initial"]),
+        cook_time=cook_time,
+        cook_time_remaining=cook_time_remaining,
     )
     binary_sensors = APCUpdateBinary(
         cooking=bool(mode == "cook"),
+        preheating=bool(state == AnovaState.preheating),
+        maintaining=bool(
+            state == AnovaState.maintaining or state == AnovaState.timer_expired
+        ),
         water_level_low=bool(nodes["lowWater"]["warning"]),
         water_level_critical=bool(nodes["lowWater"]["empty"]),
     )
