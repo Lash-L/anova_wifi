@@ -103,9 +103,10 @@ async def test_device_start_cook_sends_expected_payload() -> None:
             "command": "CMD_APC_START",
             "payload": {
                 "cookerId": DUMMY_ID,
+                "type": "a5",
                 "targetTemperature": 60.0,
-                "cookTimeSeconds": 3600,
-                "temperatureUnit": "C",
+                "unit": "C",
+                "timer": 3600,
             },
         }
     ]
@@ -135,7 +136,7 @@ async def test_device_set_timer_sends_expected_payload() -> None:
     assert api.websocket_handler.sent_commands == [
         {
             "command": "CMD_APC_SET_TIMER",
-            "payload": {"cookerId": DUMMY_ID, "cookTimeSeconds": 900},
+            "payload": {"cookerId": DUMMY_ID, "type": "a5", "timer": 900},
         }
     ]
 

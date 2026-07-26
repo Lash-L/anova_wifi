@@ -426,13 +426,7 @@ def build_a6_a7_payload(apc_response: dict[str, Any]) -> APCUpdate:
 def build_set_target_temperature_payload(
     cooker_id: str, target_temperature: float, temperature_unit: str
 ) -> dict[str, Any]:
-    """Build the payload for CMD_APC_SET_TARGET_TEMP.
-
-    Field names are inferred from the receive-side schema (see
-    ``WifiJob``/``build_wifi_cooker_state_body``) and have not been confirmed
-    against a packet capture of an outgoing command. Verify before relying on
-    this against a real device.
-    """
+    """Build the payload for CMD_APC_SET_TARGET_TEMP."""
     return {
         "cookerId": cooker_id,
         "targetTemperature": target_temperature,
@@ -442,27 +436,37 @@ def build_set_target_temperature_payload(
 
 def build_start_cook_payload(
     cooker_id: str,
+    cooker_type: str,
     target_temperature: float,
     cook_time_seconds: int,
     temperature_unit: str,
 ) -> dict[str, Any]:
-    """Build the payload for CMD_APC_START. See build_set_target_temperature_payload."""
+    """Build the payload for CMD_APC_START.
+
+    See developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands.
+    """
     return {
         "cookerId": cooker_id,
+        "type": cooker_type,
         "targetTemperature": target_temperature,
-        "cookTimeSeconds": cook_time_seconds,
-        "temperatureUnit": temperature_unit,
+        "unit": temperature_unit,
+        "timer": cook_time_seconds,
     }
 
 
 def build_stop_cook_payload(cooker_id: str) -> dict[str, Any]:
-    """Build the payload for CMD_APC_STOP. See build_set_target_temperature_payload."""
+    """Build the payload for CMD_APC_STOP."""
     return {"cookerId": cooker_id}
 
 
-def build_set_timer_payload(cooker_id: str, cook_time_seconds: int) -> dict[str, Any]:
-    """Build the payload for CMD_APC_SET_TIMER. See build_set_target_temperature_payload."""
-    return {"cookerId": cooker_id, "cookTimeSeconds": cook_time_seconds}
+def build_set_timer_payload(
+    cooker_id: str, cooker_type: str, cook_time_seconds: int
+) -> dict[str, Any]:
+    """Build the payload for CMD_APC_SET_TIMER.
+
+    See developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands.
+    """
+    return {"cookerId": cooker_id, "type": cooker_type, "timer": cook_time_seconds}
 
 
 @dataclass
@@ -512,7 +516,11 @@ class APCWifiDevice:
         await self._require_send_command()(
             AnovaCommand.CMD_APC_START,
             build_start_cook_payload(
-                self.cooker_id, target_temperature, cook_time_seconds, temperature_unit
+                self.cooker_id,
+                self.type,
+                target_temperature,
+                cook_time_seconds,
+                temperature_unit,
             ),
         )
 
@@ -526,5 +534,5 @@ class APCWifiDevice:
         """Set the cook timer without changing the cook's running state."""
         await self._require_send_command()(
             AnovaCommand.CMD_APC_SET_TIMER,
-            build_set_timer_payload(self.cooker_id, cook_time_seconds),
+            build_set_timer_payload(self.cooker_id, self.type, cook_time_seconds),
         )
