@@ -48,6 +48,17 @@ async def test_send_command_raises_on_rejected_response() -> None:
         await handler.send_command(AnovaCommand.CMD_APC_STOP, {"cookerId": "x"})
 
 
+async def test_unmatched_response_is_ignored() -> None:
+    """A stray or duplicate RESPONSE (unknown/already-resolved requestId) must not raise."""
+    handler = _make_handler()
+
+    handler.on_message(
+        {"command": "RESPONSE", "requestId": "not-a-pending-request", "payload": {}}
+    )
+
+    assert handler._pending_commands == {}
+
+
 async def test_send_command_raises_when_not_connected() -> None:
     handler = AnovaWebsocketHandler("fb_jwt", "jwt", AsyncMock())
 
