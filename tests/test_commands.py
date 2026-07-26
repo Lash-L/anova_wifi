@@ -21,6 +21,7 @@ async def _respond_to_pending_command(
 ) -> None:
     """Simulate the device replying to whatever command was just sent."""
     await asyncio.sleep(0)
+    assert handler.ws is not None
     sent_payload = handler.ws.send_json.call_args.args[0]
     handler.on_message(
         {

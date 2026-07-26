@@ -59,7 +59,9 @@ class AnovaWebsocketHandler:
     ) -> None:
         """Send a command and wait for the device to acknowledge it via RESPONSE."""
         if self.ws is None:
-            raise WebsocketFailure("Cannot send a command, the websocket is not connected.")
+            raise WebsocketFailure(
+                "Cannot send a command, the websocket is not connected."
+            )
         request_id = str(uuid.uuid4())
         future: Future[None] = asyncio.get_event_loop().create_future()
         self._pending_commands[request_id] = future
@@ -67,9 +69,8 @@ class AnovaWebsocketHandler:
             await self.ws.send_json(
                 {"command": command.value, "requestId": request_id, "payload": payload}
             )
-            async with asyncio.timeout(COMMAND_TIMEOUT):
-                await future
-        except TimeoutError as ex:
+            await asyncio.wait_for(future, timeout=COMMAND_TIMEOUT)
+        except asyncio.TimeoutError as ex:
             raise CommandFailure(
                 f"Timed out waiting for a response to {command.value}"
             ) from ex
@@ -110,7 +111,9 @@ class AnovaWebsocketHandler:
 
     def _resolve_pending_command(self, message: dict[str, Any]) -> None:
         request_id = message.get("requestId")
-        future = self._pending_commands.get(request_id)
+        future = (
+            self._pending_commands.get(request_id) if request_id is not None else None
+        )
         if future is None or future.done():
             return
         payload = message.get("payload") or {}

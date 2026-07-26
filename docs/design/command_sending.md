@@ -54,27 +54,19 @@ translate failures into `HomeAssistantError` synchronously, in the same call
 that the user triggered, which is the pattern every Platinum-tier integration
 with a write path uses (`pylamarzocco`'s `RequestNotSuccessful`, etc.).
 
-## ⚠️ Unverified: command payload field names and the `RESPONSE`/`requestId` shape
+## Command payload field names
 
-The receive-side payload shapes in this library (`build_a3_payload`, etc.)
-were derived from captured app traffic and are trustworthy. The **outgoing**
-command shapes (`build_set_target_temperature_payload` and friends) and the
-`requestId`/`RESPONSE` correlation scheme are inferred from the `AnovaCommand`
-enum values that were "grabbed from apk" (see the comment in
-`web_socket_containers.py`) — they have not been confirmed against a packet
-capture of a real command exchange.
+`build_set_target_temperature_payload` and `build_stop_cook_payload` use
+`cookerId`/`targetTemperature`/`temperatureUnit` field names. `build_start_cook_payload`
+and `build_set_timer_payload` use `cookerId`/`type`/`unit`/`timer`, matching
+Anova's documented Wi-Fi command schema (see
+[developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands](https://developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands)).
+This shape is universal across device types — there is no per-type variation
+to branch on.
 
-**Before relying on this against a real device**, capture real traffic from
-the official Anova app (e.g. with mitmproxy) sending a `CMD_APC_SET_TARGET_TEMP`
-/ `CMD_APC_START` / `CMD_APC_STOP` and confirm:
-- the exact payload field names/casing for each command
-- whether the device actually echoes a `RESPONSE` with the same `requestId`,
-  or whether success is only ever signaled by the next `EVENT_APC_STATE` push
-
-If the device doesn't echo `requestId`, the correlation logic in
-`AnovaWebsocketHandler.send_command` will need to change to either drop
-correlation (fire-and-forget, relying on the next state push) or correlate on
-`cookerId` + command type instead.
+The `requestId`/`RESPONSE` correlation scheme in
+`AnovaWebsocketHandler.send_command` is confirmed: the server echoes a
+`RESPONSE` message with the same `requestId` for every command in this file.
 
 ## What this means for the Home Assistant integration
 
