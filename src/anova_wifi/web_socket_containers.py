@@ -429,9 +429,11 @@ def build_set_target_temperature_payload(
     """Build the payload for CMD_APC_SET_TARGET_TEMP.
 
     Not part of Anova's published Wi-Fi command schema - inferred from the
-    AnovaCommand enum. Confirmed against a real device: only takes effect
-    while a job is actively running (job.target-temperature updates); a no-op
-    while idle.
+    AnovaCommand enum. Confirmed against a real device: while a job is
+    actively running, this reliably updates job.target-temperature. While
+    idle, the server acks the command but job.target-temperature never
+    changes in subsequent state pushes - the official app likely tracks the
+    pre-cook target locally and only sends it via CMD_APC_START.
     """
     return {
         "cookerId": cooker_id,
