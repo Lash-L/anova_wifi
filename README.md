@@ -38,11 +38,9 @@ Install this via pip (or your favourite package manager):
 
 `pip install anova-wifi`
 
-## Design notes
-
-Design decisions for non-obvious parts of the library, including the rationale
-for how command-sending is structured for Home Assistant consumers, are
-recorded in [`docs/design/`](docs/design/).
+Command payloads sent to devices follow Anova's documented Wi-Fi command
+schema — see
+[developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands](https://developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands).
 
 ## Contributors ✨
 
