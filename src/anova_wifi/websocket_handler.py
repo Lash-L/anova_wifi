@@ -117,7 +117,7 @@ class AnovaWebsocketHandler:
         if future is None or future.done():
             return
         payload = message.get("payload") or {}
-        if payload.get("success", True):
+        if payload.get("status") == "ok":
             future.set_result(None)
         else:
             future.set_exception(CommandFailure(f"Command was rejected: {payload}"))

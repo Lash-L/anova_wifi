@@ -27,7 +27,7 @@ async def _respond_to_pending_command(
         {
             "command": "RESPONSE",
             "requestId": sent_payload["requestId"],
-            "payload": {"success": success},
+            "payload": {"status": "ok" if success else "error"},
         }
     )
 
