@@ -38,9 +38,12 @@ Install this via pip (or your favourite package manager):
 
 `pip install anova-wifi`
 
-Command payloads sent to devices follow Anova's documented Wi-Fi command
-schema — see
+`start_cook` and `stop_cook` send payloads matching Anova's documented Wi-Fi
+command schema — see
 [developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands](https://developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands).
+`set_target_temperature` and `set_timer` call commands that aren't part of
+that published schema; they're inferred from the `AnovaCommand` enum and
+unconfirmed against real device behavior.
 
 ## Contributors ✨
 

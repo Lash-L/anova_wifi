@@ -133,7 +133,7 @@ async def test_device_stop_cook_sends_expected_payload() -> None:
     await device.stop_cook()
 
     assert api.websocket_handler.sent_commands == [
-        {"command": "CMD_APC_STOP", "payload": {"cookerId": DUMMY_ID}}
+        {"command": "CMD_APC_STOP", "payload": {"cookerId": DUMMY_ID, "type": "a5"}}
     ]
 
 

@@ -426,7 +426,11 @@ def build_a6_a7_payload(apc_response: dict[str, Any]) -> APCUpdate:
 def build_set_target_temperature_payload(
     cooker_id: str, target_temperature: float, temperature_unit: str
 ) -> dict[str, Any]:
-    """Build the payload for CMD_APC_SET_TARGET_TEMP."""
+    """Build the payload for CMD_APC_SET_TARGET_TEMP.
+
+    Not part of Anova's published Wi-Fi command schema - inferred from the
+    AnovaCommand enum and unconfirmed against real device behavior.
+    """
     return {
         "cookerId": cooker_id,
         "targetTemperature": target_temperature,
@@ -454,9 +458,12 @@ def build_start_cook_payload(
     }
 
 
-def build_stop_cook_payload(cooker_id: str) -> dict[str, Any]:
-    """Build the payload for CMD_APC_STOP."""
-    return {"cookerId": cooker_id}
+def build_stop_cook_payload(cooker_id: str, cooker_type: str) -> dict[str, Any]:
+    """Build the payload for CMD_APC_STOP.
+
+    See developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands.
+    """
+    return {"cookerId": cooker_id, "type": cooker_type}
 
 
 def build_set_timer_payload(
@@ -464,7 +471,8 @@ def build_set_timer_payload(
 ) -> dict[str, Any]:
     """Build the payload for CMD_APC_SET_TIMER.
 
-    See developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands.
+    Not part of Anova's published Wi-Fi command schema - inferred from the
+    AnovaCommand enum and unconfirmed against real device behavior.
     """
     return {"cookerId": cooker_id, "type": cooker_type, "timer": cook_time_seconds}
 
@@ -527,7 +535,8 @@ class APCWifiDevice:
     async def stop_cook(self) -> None:
         """Stop the current cook."""
         await self._require_send_command()(
-            AnovaCommand.CMD_APC_STOP, build_stop_cook_payload(self.cooker_id)
+            AnovaCommand.CMD_APC_STOP,
+            build_stop_cook_payload(self.cooker_id, self.type),
         )
 
     async def set_timer(self, cook_time_seconds: int) -> None:
