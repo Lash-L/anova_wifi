@@ -42,8 +42,10 @@ Install this via pip (or your favourite package manager):
 command schema — see
 [developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands](https://developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands).
 `set_target_temperature` and `set_timer` call commands that aren't part of
-that published schema; they're inferred from the `AnovaCommand` enum and
-unconfirmed against real device behavior.
+that published schema; they're inferred from the `AnovaCommand` enum, but both
+have been confirmed working against a real device. `set_timer` takes effect
+even while idle; `set_target_temperature` only takes effect while a cook is
+actively running (it's a no-op while idle).
 
 ## Contributors ✨
 

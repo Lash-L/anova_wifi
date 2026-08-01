@@ -95,8 +95,9 @@ async def test_device_set_target_temperature_sends_expected_payload() -> None:
             "command": "CMD_APC_SET_TARGET_TEMP",
             "payload": {
                 "cookerId": DUMMY_ID,
+                "type": "a5",
                 "targetTemperature": 60.0,
-                "temperatureUnit": "C",
+                "unit": "C",
             },
         }
     ]

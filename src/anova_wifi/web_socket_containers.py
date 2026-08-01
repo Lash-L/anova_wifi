@@ -424,17 +424,20 @@ def build_a6_a7_payload(apc_response: dict[str, Any]) -> APCUpdate:
 
 
 def build_set_target_temperature_payload(
-    cooker_id: str, target_temperature: float, temperature_unit: str
+    cooker_id: str, cooker_type: str, target_temperature: float, temperature_unit: str
 ) -> dict[str, Any]:
     """Build the payload for CMD_APC_SET_TARGET_TEMP.
 
     Not part of Anova's published Wi-Fi command schema - inferred from the
-    AnovaCommand enum and unconfirmed against real device behavior.
+    AnovaCommand enum. Confirmed against a real device: only takes effect
+    while a job is actively running (job.target-temperature updates); a no-op
+    while idle.
     """
     return {
         "cookerId": cooker_id,
+        "type": cooker_type,
         "targetTemperature": target_temperature,
-        "temperatureUnit": temperature_unit,
+        "unit": temperature_unit,
     }
 
 
@@ -472,7 +475,8 @@ def build_set_timer_payload(
     """Build the payload for CMD_APC_SET_TIMER.
 
     Not part of Anova's published Wi-Fi command schema - inferred from the
-    AnovaCommand enum and unconfirmed against real device behavior.
+    AnovaCommand enum. Confirmed against a real device, including while idle
+    (job.cook-time-seconds updates immediately).
     """
     return {"cookerId": cooker_id, "type": cooker_type, "timer": cook_time_seconds}
 
@@ -506,11 +510,14 @@ class APCWifiDevice:
     async def set_target_temperature(
         self, target_temperature: float, temperature_unit: str
     ) -> None:
-        """Set the target temperature for the current or next cook."""
+        """Set the target temperature of the currently running cook.
+
+        No-op if no cook is currently running - see build_set_target_temperature_payload.
+        """
         await self._require_send_command()(
             AnovaCommand.CMD_APC_SET_TARGET_TEMP,
             build_set_target_temperature_payload(
-                self.cooker_id, target_temperature, temperature_unit
+                self.cooker_id, self.type, target_temperature, temperature_unit
             ),
         )
 
