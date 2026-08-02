@@ -3,7 +3,16 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from anova_wifi import AnovaCommand, APCWifiDevice, CommandFailure, WebsocketFailure
+from anova_wifi import (
+    AnovaCommand,
+    APCUpdate,
+    APCUpdateBinary,
+    APCUpdateSensor,
+    APCWifiDevice,
+    CommandFailure,
+    NoActiveCookError,
+    WebsocketFailure,
+)
 from anova_wifi.mocks.anova_api import DUMMY_ID, anova_api_mock
 from anova_wifi.websocket_handler import AnovaWebsocketHandler
 
@@ -14,6 +23,13 @@ def _make_handler() -> AnovaWebsocketHandler:
     handler = AnovaWebsocketHandler("fb_jwt", "jwt", AsyncMock())
     handler.ws = AsyncMock()
     return handler
+
+
+def _cooking_update() -> APCUpdate:
+    return APCUpdate(
+        binary_sensor=APCUpdateBinary(cooking=True),
+        sensor=APCUpdateSensor(mode="cook"),
+    )
 
 
 async def _respond_to_pending_command(
@@ -82,13 +98,42 @@ async def test_device_without_handler_raises() -> None:
         await device.stop_cook()
 
 
-async def test_device_set_target_temperature_sends_expected_payload() -> None:
+async def test_update_running_cook_raises_without_active_cook() -> None:
     api = anova_api_mock()
     await api.authenticate()
     await api.create_websocket()
     device = api.websocket_handler.devices[DUMMY_ID]
 
-    await device.set_target_temperature(60.0, "C")
+    with pytest.raises(NoActiveCookError):
+        await device.update_running_cook(target_temperature=60.0, temperature_unit="C")
+
+
+async def test_update_running_cook_requires_at_least_one_param() -> None:
+    device = APCWifiDevice(cooker_id="x", type="a5", paired_at="now", name="test")
+
+    with pytest.raises(ValueError, match="At least one of"):
+        await device.update_running_cook()
+
+
+async def test_update_running_cook_requires_temperature_unit_with_target_temperature() -> (
+    None
+):
+    device = APCWifiDevice(cooker_id="x", type="a5", paired_at="now", name="test")
+
+    with pytest.raises(ValueError, match="temperature_unit is required"):
+        await device.update_running_cook(target_temperature=60.0)
+
+
+async def test_update_running_cook_sends_expected_payloads_when_cooking() -> None:
+    api = anova_api_mock()
+    await api.authenticate()
+    await api.create_websocket()
+    device = api.websocket_handler.devices[DUMMY_ID]
+    device.last_update = _cooking_update()
+
+    await device.update_running_cook(
+        target_temperature=60.0, temperature_unit="C", cook_time_seconds=900
+    )
 
     assert api.websocket_handler.sent_commands == [
         {
@@ -99,7 +144,11 @@ async def test_device_set_target_temperature_sends_expected_payload() -> None:
                 "targetTemperature": 60.0,
                 "unit": "C",
             },
-        }
+        },
+        {
+            "command": "CMD_APC_SET_TIMER",
+            "payload": {"cookerId": DUMMY_ID, "type": "a5", "timer": 900},
+        },
     ]
 
 
@@ -135,22 +184,6 @@ async def test_device_stop_cook_sends_expected_payload() -> None:
 
     assert api.websocket_handler.sent_commands == [
         {"command": "CMD_APC_STOP", "payload": {"cookerId": DUMMY_ID, "type": "a5"}}
-    ]
-
-
-async def test_device_set_timer_sends_expected_payload() -> None:
-    api = anova_api_mock()
-    await api.authenticate()
-    await api.create_websocket()
-    device = api.websocket_handler.devices[DUMMY_ID]
-
-    await device.set_timer(900)
-
-    assert api.websocket_handler.sent_commands == [
-        {
-            "command": "CMD_APC_SET_TIMER",
-            "payload": {"cookerId": DUMMY_ID, "type": "a5", "timer": 900},
-        }
     ]
 
 

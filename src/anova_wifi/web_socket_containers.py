@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from .exceptions import WebsocketFailure
+from .exceptions import NoActiveCookError, WebsocketFailure
 
 # All of the containers would probably be better of using dacite, but since HA sometimes has issues with dacite I am
 # doing them manually
@@ -478,9 +478,39 @@ def build_set_timer_payload(
 
     Not part of Anova's published Wi-Fi command schema - inferred from the
     AnovaCommand enum. Confirmed against a real device, including while idle
-    (job.cook-time-seconds updates immediately).
+    (job.cook-time-seconds updates immediately) - APCWifiDevice.update_running_cook
+    still requires an active cook for this too, to keep its API scoped to
+    "modify the running job" rather than exposing an idle-only timer with no
+    clear product meaning.
     """
     return {"cookerId": cooker_id, "type": cooker_type, "timer": cook_time_seconds}
+
+
+class Capability(str, Enum):
+    """A command that a device may or may not support, and/or be valid to call right now."""
+
+    START_COOK = "start_cook"
+    STOP_COOK = "stop_cook"
+    UPDATE_RUNNING_COOK = "update_running_cook"
+
+
+# Precision Cooker (APC) device type identifiers, per
+# developer.anovaculinary.com/docs/devices/wifi/authentication. All of them
+# share the same command schema (see build_start_cook_payload et al.), so
+# they all support the same set of commands.
+_APC_TYPES = frozenset({"a3", "a4", "a5", "a6", "a7", "a8", "pro"})
+_APC_CAPABILITIES = frozenset(Capability)
+
+
+def get_supported_capabilities(device_type: str) -> frozenset[Capability]:
+    """Return the commands supported by a device of the given type, regardless of its current state.
+
+    Unrecognized types (e.g. a future Precision Oven type) report no
+    capabilities rather than assuming untested command support.
+    """
+    if device_type in _APC_TYPES:
+        return _APC_CAPABILITIES
+    return frozenset()
 
 
 @dataclass
@@ -496,9 +526,40 @@ class APCWifiDevice:
     send_command: (
         Callable[[AnovaCommand, dict[str, Any]], Coroutine[Any, Any, None]] | None
     ) = field(default=None, repr=False, compare=False)
+    # Cached from the last EVENT_APC_STATE push, regardless of update_listener,
+    # so update_running_cook can tell whether a cook is actually active. The
+    # device protocol has no persistent job/session id to validate against -
+    # job.id in EVENT_APC_STATE is just an echo of the last command's requestId.
+    last_update: "APCUpdate | None" = field(default=None, repr=False, compare=False)
 
     def set_update_listener(self, update_function: Callable[[APCUpdate], None]) -> None:
         self.update_listener = update_function
+
+    @property
+    def is_cooking(self) -> bool:
+        """Whether a cook is currently active, from the last EVENT_APC_STATE push."""
+        return self.last_update is not None and self.last_update.binary_sensor.cooking
+
+    @property
+    def supported_capabilities(self) -> frozenset[Capability]:
+        """The commands this device type supports, regardless of its current state."""
+        return get_supported_capabilities(self.type)
+
+    @property
+    def available_commands(self) -> frozenset[Capability]:
+        """Commands that are valid to call right now: supported by this device
+        type AND valid given its current cooking state.
+
+        Reflects last_update, so it's only as fresh as the last state push -
+        useful for callers (e.g. deciding which HA entities/services to
+        expose) but not a substitute for handling NoActiveCookError, since
+        state can change between checking this and calling a command.
+        """
+        if self.is_cooking:
+            valid_now = frozenset({Capability.STOP_COOK, Capability.UPDATE_RUNNING_COOK})
+        else:
+            valid_now = frozenset({Capability.START_COOK})
+        return self.supported_capabilities & valid_now
 
     def _require_send_command(
         self,
@@ -509,19 +570,51 @@ class APCWifiDevice:
             )
         return self.send_command
 
-    async def set_target_temperature(
-        self, target_temperature: float, temperature_unit: str
-    ) -> None:
-        """Set the target temperature of the currently running cook.
+    def _require_active_cook(self) -> None:
+        if not self.is_cooking:
+            raise NoActiveCookError(
+                "No cook is currently running on this device - target temperature "
+                "and timer can only be changed while a cook is active. Use "
+                "start_cook to begin one."
+            )
 
-        No-op if no cook is currently running - see build_set_target_temperature_payload.
+    async def update_running_cook(
+        self,
+        *,
+        target_temperature: float | None = None,
+        temperature_unit: str | None = None,
+        cook_time_seconds: int | None = None,
+    ) -> None:
+        """Change the target temperature and/or timer of the currently running cook.
+
+        Raises NoActiveCookError if no cook is currently running - see
+        build_set_target_temperature_payload for why that can't be validated
+        via the device's own RESPONSE instead.
         """
-        await self._require_send_command()(
-            AnovaCommand.CMD_APC_SET_TARGET_TEMP,
-            build_set_target_temperature_payload(
-                self.cooker_id, self.type, target_temperature, temperature_unit
-            ),
-        )
+        if target_temperature is None and cook_time_seconds is None:
+            raise ValueError(
+                "At least one of target_temperature or cook_time_seconds must be given."
+            )
+        if target_temperature is not None and temperature_unit is None:
+            raise ValueError(
+                "temperature_unit is required when target_temperature is given."
+            )
+        self._require_active_cook()
+
+        send_command = self._require_send_command()
+        if target_temperature is not None:
+            assert temperature_unit is not None
+            await send_command(
+                AnovaCommand.CMD_APC_SET_TARGET_TEMP,
+                build_set_target_temperature_payload(
+                    self.cooker_id, self.type, target_temperature, temperature_unit
+                ),
+            )
+        if cook_time_seconds is not None:
+            await send_command(
+                AnovaCommand.CMD_APC_SET_TIMER,
+                build_set_timer_payload(self.cooker_id, self.type, cook_time_seconds),
+            )
 
     async def start_cook(
         self,
@@ -546,11 +639,4 @@ class APCWifiDevice:
         await self._require_send_command()(
             AnovaCommand.CMD_APC_STOP,
             build_stop_cook_payload(self.cooker_id, self.type),
-        )
-
-    async def set_timer(self, cook_time_seconds: int) -> None:
-        """Set the cook timer without changing the cook's running state."""
-        await self._require_send_command()(
-            AnovaCommand.CMD_APC_SET_TIMER,
-            build_set_timer_payload(self.cooker_id, self.type, cook_time_seconds),
         )

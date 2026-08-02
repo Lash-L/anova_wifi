@@ -24,3 +24,7 @@ class LoginUnreachable(AnovaException):
 
 class CommandFailure(AnovaException):
     """Raised when a command sent to a device is rejected or times out."""
+
+
+class NoActiveCookError(AnovaException):
+    """Raised when a running-cook-only command is called with no cook active."""
