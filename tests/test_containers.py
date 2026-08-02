@@ -46,7 +46,7 @@ def test_a4_payload():
     assert resp.sensor.target_temperature == 66.11
     assert resp.sensor.state == AnovaState.cooking.name
     assert resp.sensor.cook_time_remaining == 0
-    assert resp.sensor.time_maintaining is None
+    assert resp.sensor.time_maintaining == 0
 
 
 def test_a7_payload():

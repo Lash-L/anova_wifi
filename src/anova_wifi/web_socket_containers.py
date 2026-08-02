@@ -202,7 +202,7 @@ class WifiCookerStateBody:
                 0 if is_maintaining else self.job_status.cook_time_remaining
             ),
             time_maintaining=(
-                self.job_status.cook_time_remaining if is_maintaining else None
+                self.job_status.cook_time_remaining if is_maintaining else 0
             ),
             firmware_version=self.firmware_version,
             heater_temperature=self.temperature_info.heater_temperature,
