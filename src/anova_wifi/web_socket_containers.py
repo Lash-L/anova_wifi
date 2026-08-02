@@ -545,6 +545,15 @@ class APCWifiDevice:
     # device protocol has no persistent job/session id to validate against -
     # job.id in EVENT_APC_STATE is just an echo of the last command's requestId.
     last_update: "APCUpdate | None" = field(default=None, repr=False, compare=False)
+    # Wall-clock time the last EVENT_APC_STATE push was received, set by
+    # AnovaWebsocketHandler.on_message. Anova's protocol has no offline/disconnect
+    # signal (confirmed against the developer docs and by observing a real device
+    # unplug - no EVENT_APC_WIFI_REMOVED, no other message, ever arrives), so
+    # callers must infer a dead device from silence using this timestamp - the
+    # same approach the official Anova app uses.
+    last_update_received_at: datetime | None = field(
+        default=None, repr=False, compare=False
+    )
 
     def set_update_listener(self, update_function: Callable[[APCUpdate], None]) -> None:
         self.update_listener = update_function

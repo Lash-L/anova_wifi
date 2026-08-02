@@ -1,4 +1,5 @@
 import asyncio
+from datetime import UTC, datetime
 import json
 import logging
 import uuid
@@ -115,6 +116,7 @@ class AnovaWebsocketHandler:
             else:
                 return
             device.last_update = update
+            device.last_update_received_at = datetime.now(UTC)
             if device.update_listener is not None:
                 device.update_listener(update)
         elif message["command"] == AnovaCommand.RESPONSE:
