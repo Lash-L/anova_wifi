@@ -30,6 +30,11 @@ class APCUpdateSensor:
     a3_state: str | None = None
     target_temperature: float | None = None
     cook_time_remaining: int | None = None
+    # Seconds spent in the post-cook keep-warm phase (state MAINTAINING/
+    # TIMER_EXPIRED). The device keeps counting job_status.cook-time-remaining
+    # upward once the timer hits zero rather than resetting it, so it's split
+    # out here instead of being reported as a countdown that counts up.
+    time_maintaining: int | None = None
     firmware_version: str | None = None
     heater_temperature: float | None = None
     triac_temperature: float | None = None
@@ -184,12 +189,21 @@ class WifiCookerStateBody:
             return "unknown"
 
     def to_apc_update(self) -> APCUpdate:
+        is_maintaining = self.job_status.state in (
+            AnovaState.maintaining,
+            AnovaState.timer_expired,
+        )
         sensors = APCUpdateSensor(
             cook_time=self.job.cook_time_seconds,
             mode=self.job.mode.name,
             state=self.job_status.state.name,
             target_temperature=self.job.target_temperature,
-            cook_time_remaining=self.job_status.cook_time_remaining,
+            cook_time_remaining=(
+                0 if is_maintaining else self.job_status.cook_time_remaining
+            ),
+            time_maintaining=(
+                self.job_status.cook_time_remaining if is_maintaining else None
+            ),
             firmware_version=self.firmware_version,
             heater_temperature=self.temperature_info.heater_temperature,
             triac_temperature=self.temperature_info.triac_temperature,

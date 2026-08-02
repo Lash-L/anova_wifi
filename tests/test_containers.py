@@ -16,6 +16,22 @@ from tests.example_data import (
 )
 
 
+def test_a4_payload_while_maintaining():
+    """The device keeps counting job-status.cook-time-remaining upward once the
+    timer expires, rather than resetting it - it must be reported as
+    time_maintaining, not as a countdown that counts up."""
+    message = deepcopy(A4_MESSAGE)
+    state = message["payload"]["state"]
+    state["job-status"]["state"] = "MAINTAINING"
+    state["job-status"]["cook-time-remaining"] = 245
+
+    resp = build_wifi_cooker_state_body(state).to_apc_update()
+    assert resp.sensor.state == AnovaState.maintaining.name
+    assert resp.sensor.cook_time_remaining == 0
+    assert resp.sensor.time_maintaining == 245
+    assert resp.binary_sensor.maintaining is True
+
+
 def test_a3_payload():
     resp = build_a3_payload(A3_MESSAGE["payload"]["state"])
     # Ensure some of the basics
@@ -30,6 +46,7 @@ def test_a4_payload():
     assert resp.sensor.target_temperature == 66.11
     assert resp.sensor.state == AnovaState.cooking.name
     assert resp.sensor.cook_time_remaining == 0
+    assert resp.sensor.time_maintaining is None
 
 
 def test_a7_payload():
