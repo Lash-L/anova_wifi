@@ -1,8 +1,10 @@
 from unittest.mock import AsyncMock
 
+from aiohttp import ClientConnectionResetError
 import pytest
 
-from anova_wifi.web_socket_containers import APCWifiDevice
+from anova_wifi.exceptions import WebsocketFailure
+from anova_wifi.web_socket_containers import AnovaCommand, APCWifiDevice
 from anova_wifi.websocket_handler import (
     WEBSOCKET_HEARTBEAT_SECONDS,
     AnovaWebsocketHandler,
@@ -22,6 +24,24 @@ async def test_connect_passes_heartbeat_to_ws_connect() -> None:
     session.ws_connect.assert_awaited_once_with(
         handler.url, heartbeat=WEBSOCKET_HEARTBEAT_SECONDS
     )
+
+
+@pytest.mark.asyncio
+async def test_send_command_wraps_connection_reset_as_websocket_failure() -> None:
+    """A dying transport races the reconnect logic - send_json can raise
+    ClientConnectionResetError even though self.ws is still set. Callers
+    only handle WebsocketFailure/CommandFailure, so the raw aiohttp
+    exception must be wrapped rather than propagated as-is."""
+    handler = AnovaWebsocketHandler(
+        firebase_jwt="firebase_jwt", jwt="jwt", session=AsyncMock()
+    )
+    handler.ws = AsyncMock()
+    handler.ws.send_json.side_effect = ClientConnectionResetError(
+        "Cannot write to closing transport"
+    )
+
+    with pytest.raises(WebsocketFailure):
+        await handler.send_command(AnovaCommand.CMD_APC_STOP, {})
 
 
 def test_state_push_caches_last_update_without_a_listener() -> None:

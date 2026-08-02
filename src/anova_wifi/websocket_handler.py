@@ -5,7 +5,12 @@ import uuid
 from asyncio import Future
 from typing import Any
 
-from aiohttp import ClientSession, ClientWebSocketResponse, WebSocketError
+from aiohttp import (
+    ClientConnectionResetError,
+    ClientSession,
+    ClientWebSocketResponse,
+    WebSocketError,
+)
 
 from . import CommandFailure, WebsocketFailure
 from .web_socket_containers import (
@@ -73,6 +78,10 @@ class AnovaWebsocketHandler:
         except asyncio.TimeoutError as ex:
             raise CommandFailure(
                 f"Timed out waiting for a response to {command.value}"
+            ) from ex
+        except ClientConnectionResetError as ex:
+            raise WebsocketFailure(
+                "Websocket connection was lost while sending a command"
             ) from ex
         finally:
             self._pending_commands.pop(request_id, None)
