@@ -19,19 +19,41 @@ class AnovaApi:
     def __init__(
         self,
         session: aiohttp.ClientSession,
-        username: str,
-        password: str,
+        username: str | None = None,
+        password: str | None = None,
+        *,
+        personal_access_token: str | None = None,
     ) -> None:
-        """Creates an anova api class"""
+        """Creates an anova api class.
+
+        Provide either a personal_access_token (see
+        developer.anovaculinary.com/docs/devices/wifi/personal-access-tokens)
+        or a username/password, not both.
+        """
+        if personal_access_token is not None:
+            if username is not None or password is not None:
+                raise ValueError(
+                    "Provide either personal_access_token or username/password, not both."
+                )
+        elif username is None or password is None:
+            raise ValueError(
+                "Provide either personal_access_token, or both username and password."
+            )
         self.session = session
         self.username = username
         self.password = password
+        self._personal_access_token = personal_access_token
         self.jwt: str | None = None
         self._firebase_jwt: str | None = None
         self.websocket_handler: AnovaWebsocketHandler | None = None
 
     async def authenticate(self) -> bool:
-        """Auth with Firebase server"""
+        """Auth with Firebase server, or use the configured Personal Access Token directly."""
+        if self._personal_access_token is not None:
+            self._firebase_jwt = self._personal_access_token
+            self.jwt = self._personal_access_token
+            return True
+
         # Code loving yoinked from https://github.com/ammarzuberi/pyanova-api/blob/master/anova/AnovaCooker.py
         firebase_req_data = {
             "email": self.username,
