@@ -1,8 +1,8 @@
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock
 
-from aiohttp import ClientConnectionResetError
 import pytest
+from aiohttp import ClientConnectionResetError
 
 from anova_wifi.exceptions import WebsocketFailure
 from anova_wifi.web_socket_containers import AnovaCommand, APCWifiDevice
@@ -53,8 +53,9 @@ def test_state_push_caches_last_update_without_a_listener() -> None:
     )
     device = APCWifiDevice(cooker_id="x", type="pro", paired_at="now", name="test")
     handler.devices["x"] = device
+    initial_last_update_received_at = device.last_update_received_at
     assert device.update_listener is None
-    assert device.last_update_received_at is None
+    assert initial_last_update_received_at is None
 
     before = datetime.now(UTC)
     handler.on_message(
@@ -89,4 +90,5 @@ def test_state_push_caches_last_update_without_a_listener() -> None:
     assert device.last_update is not None
     assert device.is_cooking is True
     assert device.last_update_received_at is not None
-    assert before <= device.last_update_received_at <= datetime.now(UTC)
+    assert before <= device.last_update_received_at
+    assert device.last_update_received_at <= datetime.now(UTC)

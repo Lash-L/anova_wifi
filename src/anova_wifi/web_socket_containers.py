@@ -579,7 +579,9 @@ class APCWifiDevice:
         state can change between checking this and calling a command.
         """
         if self.is_cooking:
-            valid_now = frozenset({Capability.STOP_COOK, Capability.UPDATE_RUNNING_COOK})
+            valid_now = frozenset(
+                {Capability.STOP_COOK, Capability.UPDATE_RUNNING_COOK}
+            )
         else:
             valid_now = frozenset({Capability.START_COOK})
         return self.supported_capabilities & valid_now
