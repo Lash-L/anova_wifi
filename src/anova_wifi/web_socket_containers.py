@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 # All of the containers would probably be better of using dacite, but since HA sometimes has issues with dacite I am
 # doing them manually
@@ -235,21 +236,31 @@ def build_wifi_cooker_state_body(apc_response: dict[str, Any]) -> WifiCookerStat
     motor_control = apc_response.get("motor-control")
     pin_info_json: dict[str, int] = apc_response["pin-info"]
     pin_info = WifiPinInfo(
-        is_device_safe=bool(pin_info_json["device-safe"])
-        if "device-safe" in pin_info_json
-        else None,
-        is_water_leak=bool(pin_info_json.get("water-leak"))
-        if "water-leak" in pin_info_json
-        else None,
-        is_water_level_critical=bool(pin_info_json.get("water-level-critical"))
-        if "water-level-critical" in pin_info_json
-        else None,
-        is_water_level_low=bool(pin_info_json.get("water-level-low"))
-        if "water-level-low" in pin_info_json
-        else None,
-        water_temp_too_high=bool(pin_info_json.get("water-temp-too-high"))
-        if "water-temp-too-high" in pin_info_json
-        else None,
+        is_device_safe=(
+            bool(pin_info_json["device-safe"])
+            if "device-safe" in pin_info_json
+            else None
+        ),
+        is_water_leak=(
+            bool(pin_info_json.get("water-leak"))
+            if "water-leak" in pin_info_json
+            else None
+        ),
+        is_water_level_critical=(
+            bool(pin_info_json.get("water-level-critical"))
+            if "water-level-critical" in pin_info_json
+            else None
+        ),
+        is_water_level_low=(
+            bool(pin_info_json.get("water-level-low"))
+            if "water-level-low" in pin_info_json
+            else None
+        ),
+        water_temp_too_high=(
+            bool(pin_info_json.get("water-temp-too-high"))
+            if "water-temp-too-high" in pin_info_json
+            else None
+        ),
     )
     system_info_json: dict[str, str] | None = apc_response.get("system-info")
     if system_info_json is not None:
@@ -265,9 +276,11 @@ def build_wifi_cooker_state_body(apc_response: dict[str, Any]) -> WifiCookerStat
             firmware_version=system_info_3220_json["firmware-version"],
             has_real_cert_catalog=system_info_3220_json.get("has-real-cert-catalog"),
             firmware_version_raw=system_info_3220_json.get("firmware-version-raw"),
-            largest_free_heap_size=int(largest_free_heap_size)
-            if largest_free_heap_size is not None
-            else None,
+            largest_free_heap_size=(
+                int(largest_free_heap_size)
+                if largest_free_heap_size is not None
+                else None
+            ),
             # Too lazy to do these right now.
             # stack_low_level=system_info_3220_json.get("stack-low-level"),
             # stack_low_task=system_info_3220_json.get("stack-low-task"),
