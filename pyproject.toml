@@ -22,8 +22,8 @@ packages = [
 "Changelog" = "https://github.com/Lash-L/anova_wifi/blob/main/CHANGELOG.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-aiohttp = "^3.9.3"
+python = "^3.14.2"
+aiohttp = "^3.11.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.4,<9.0"
