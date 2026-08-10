@@ -71,10 +71,10 @@ class AnovaState(str, Enum):
     maintaining = "MAINTAINING"
     timer_expired = "TIMER EXPIRED"
     set_timer = "SET TIMER"
-    # Pushed transiently when a cook starts or resumes, e.g. right after the
-    # device powers back on with a job already running - confirmed against a
-    # real device push that HA's message listener previously crashed on.
-    start_cook = "START_COOK"
+    # The device's boot-time idle state: powered on and ready to start a
+    # cook, not yet mid-job. Confirmed against a real device push that HA's
+    # message listener previously crashed on, having never seen this value.
+    ready_to_cook = "START_COOK"
     no_state = ""
     # Anova's developer docs don't enumerate job-status.state values at all,
     # so unrecognized ones (a hypothetical STOP_COOK, or any future addition)

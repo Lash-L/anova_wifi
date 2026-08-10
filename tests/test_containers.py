@@ -32,15 +32,15 @@ def test_a4_payload_while_maintaining():
     assert resp.binary_sensor.maintaining is True
 
 
-def test_a4_payload_start_cook():
-    """A real device push uses this state right after powering back on with a
-    job already running - it must parse, not raise ValueError."""
+def test_a4_payload_ready_to_cook():
+    """A real device push uses this state at boot, before any job starts -
+    it must parse, not raise ValueError."""
     message = deepcopy(A4_MESSAGE)
     state = message["payload"]["state"]
     state["job-status"]["state"] = "START_COOK"
 
     resp = build_wifi_cooker_state_body(state).to_apc_update()
-    assert resp.sensor.state == AnovaState.start_cook.name
+    assert resp.sensor.state == AnovaState.ready_to_cook.name
 
 
 def test_a4_payload_unrecognized_state():
