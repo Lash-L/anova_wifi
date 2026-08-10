@@ -32,6 +32,28 @@ def test_a4_payload_while_maintaining():
     assert resp.binary_sensor.maintaining is True
 
 
+def test_a4_payload_start_cook():
+    """A real device push uses this state right after powering back on with a
+    job already running - it must parse, not raise ValueError."""
+    message = deepcopy(A4_MESSAGE)
+    state = message["payload"]["state"]
+    state["job-status"]["state"] = "START_COOK"
+
+    resp = build_wifi_cooker_state_body(state).to_apc_update()
+    assert resp.sensor.state == AnovaState.start_cook.name
+
+
+def test_a4_payload_unrecognized_state():
+    """An undocumented job-status.state value must degrade to 'unknown'
+    rather than raising and killing the websocket message listener."""
+    message = deepcopy(A4_MESSAGE)
+    state = message["payload"]["state"]
+    state["job-status"]["state"] = "STOP_COOK"
+
+    resp = build_wifi_cooker_state_body(state).to_apc_update()
+    assert resp.sensor.state == AnovaState.unknown.name
+
+
 def test_a3_payload():
     resp = build_a3_payload(A3_MESSAGE["payload"]["state"])
     # Ensure some of the basics

@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -5,6 +6,12 @@ from enum import Enum
 from typing import Any
 
 from .exceptions import NoActiveCookError, WebsocketFailure
+
+_LOGGER = logging.getLogger(__name__)
+
+# Distinct unrecognized AnovaState values already warned about - module-level
+# (not a class attribute) so it isn't picked up as an Enum member.
+_warned_unknown_states: set[object] = set()
 
 # All of the containers would probably be better of using dacite, but since HA sometimes has issues with dacite I am
 # doing them manually
@@ -64,7 +71,25 @@ class AnovaState(str, Enum):
     maintaining = "MAINTAINING"
     timer_expired = "TIMER EXPIRED"
     set_timer = "SET TIMER"
+    # Pushed transiently when a cook starts or resumes, e.g. right after the
+    # device powers back on with a job already running - confirmed against a
+    # real device push that HA's message listener previously crashed on.
+    start_cook = "START_COOK"
     no_state = ""
+    # Anova's developer docs don't enumerate job-status.state values at all,
+    # so unrecognized ones (a hypothetical STOP_COOK, or any future addition)
+    # must not crash the websocket listener - fall back to this instead.
+    unknown = "UNKNOWN"
+
+    @classmethod
+    def _missing_(cls, value: object) -> "AnovaState":
+        # Pushed on every state message (~2s cadence) while a device is
+        # sending an unrecognized value - warn once per distinct value, not
+        # once per message, or this floods the log forever.
+        if value not in _warned_unknown_states:
+            _warned_unknown_states.add(value)
+            _LOGGER.warning("Unrecognized Anova job-status state %r", value)
+        return cls.unknown
 
 
 class AnovaA3State(str, Enum):
