@@ -38,6 +38,27 @@ Install this via pip (or your favourite package manager):
 
 `pip install anova-wifi`
 
+`APCWifiDevice` exposes three command methods:
+
+- `start_cook(target_temperature, cook_time_seconds, temperature_unit)` — begin
+  a new cook. Matches Anova's documented Wi-Fi command schema — see
+  [developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands](https://developer.anovaculinary.com/docs/devices/wifi/sous-vide-commands).
+- `stop_cook()` — stop the current cook. Also part of the documented schema.
+- `update_running_cook(target_temperature=None, temperature_unit=None, cook_time_seconds=None)` —
+  change the target temperature and/or timer of an _already-running_ cook.
+  Not part of Anova's published schema (inferred from the `AnovaCommand`
+  enum), but confirmed working against a real device. Raises
+  `NoActiveCookError` if no cook is currently running, since the device
+  itself doesn't reject this the way it rejects other invalid commands - it
+  silently acks and ignores the change instead.
+
+`APCWifiDevice.available_commands` reports which of these are valid to call
+right now, combining `supported_capabilities` (does this device _type_
+support command sending at all - `pro`/`a3`-`a8` do, a future Precision Oven
+type wouldn't) with its current cooking state (from the last state push).
+It's advisory only - state can change between checking it and calling a
+command, so callers still need to handle the exceptions above.
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):

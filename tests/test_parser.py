@@ -6,6 +6,7 @@ from anova_wifi import AnovaApi
 pytestmark = pytest.mark.asyncio
 
 
+@pytest.mark.asyncio
 async def test_can_create() -> None:
     AnovaApi(aiohttp.ClientSession(), "", "")
 

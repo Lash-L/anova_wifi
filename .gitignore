@@ -139,3 +139,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 /src/anova_wifi/test.py
+
+# Manual real-device verification scripts (contain a hardcoded email)
+/scripts/
